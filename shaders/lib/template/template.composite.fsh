@@ -6,12 +6,12 @@
 */
 
 #version 120
+#extension GL_EXT_gpu_shader4 : enable
 
 #include "/lib/common/data/ShaderStructure.glsl"
 #define STAGE COMPOSITE
 #define TYPE FSH
 #define SHADER NONE
-#include "/lib/Settings.glsl"
 #include "/lib/Syntax.glsl"
 
 // CONST
