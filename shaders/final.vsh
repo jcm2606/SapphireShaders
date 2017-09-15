@@ -9,16 +9,22 @@
 #extension GL_EXT_gpu_shader4 : enable
 
 #include "/lib/common/data/ShaderStructure.glsl"
-#define STAGE COMPOSITE
+#define STAGE FINAL
 #define TYPE VSH
 #define SHADER NONE
 #include "/lib/Syntax.glsl"
 
 // CONST
 // VARYING
+varying vec2 texcoord;
+
 // UNIFORM
 // STRUCT
 // ARBITRARY
 // INCLUDES
 // MAIN
-void main() {}
+void main() {
+  gl_Position = ftransform();
+
+  texcoord = gl_MultiTexCoord0.xy;
+}

@@ -16,9 +16,15 @@
 
 // CONST
 // VARYING
+varying vec2 texcoord;
+
 // UNIFORM
 // STRUCT
 // ARBITRARY
 // INCLUDES
 // MAIN
-void main() {}
+void main() {
+  gl_Position = ftransform();
+
+  texcoord = gl_MultiTexCoord0.xy;
+}
