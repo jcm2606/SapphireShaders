@@ -1,7 +1,3 @@
-# SapphireShaders.
-# jcm2606.
-# shaderLABs.
-
 # Sapphire
 Sapphire is my latest shader pack, and successor to Serenity.
 Sapphire will be a realistic/atmospheric shader, employing heavy use of features such as volumetric clouds, fog, and PCSS.
