@@ -1,0 +1,49 @@
+# Ground Foliage
+block.1 = sapling tallgrass deadbush yellow_flower red_flower brown_mushroom red_mushroom reeds
+
+# Double Foliage
+block.2 = double_plant
+
+# Hanging Foliage
+block.3 = vine
+
+# Water Foliage
+block.4 = waterlily
+
+# Leaves
+block.5 = leaves leaves2
+
+# Crops
+block.6 = wheat carrots potatoes beetroots
+
+# Fire
+block.7 = fire
+
+# Metals
+block.8 = gold_block iron_block
+
+# Fluids
+block.9 = flowing_water water flowing_lava lava
+
+# Ice
+block.10 = ice packed_ice
+
+# Stained Glass
+block.11 = stained_glass
+
+# Emissive
+block.12 = torch redstone_torch lit_pumpkin glowstone lit_redstone_lamp beacon
+
+# Rough Stone
+block.13 = stone cobblestone
+
+# Smooth Stone
+
+# Standing Banner
+block.15 = standing_banner
+
+# Hanging Banner
+block.16 = wall_banner
+
+# Grass
+block.17 = grass

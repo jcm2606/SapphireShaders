@@ -5,8 +5,8 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#ifndef INT_INCLUDED_VECTOR
-  #define INT_INCLUDED_VECTOR
+#ifndef INT_INCLUDED_SYNTAX_VECTOR
+  #define INT_INCLUDED_SYNTAX_VECTOR
 
   const vec2 swizzle2 = vec2(1.0, 0.0);
   const vec3 swizzle3 = vec3(1.0, 0.0, 0.5);

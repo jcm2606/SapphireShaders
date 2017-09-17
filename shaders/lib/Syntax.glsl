@@ -15,4 +15,7 @@
   #include "/lib/common/syntax/Vector.glsl"
   #include "/lib/common/syntax/Matrix.glsl"
   #include "/lib/common/syntax/Function.glsl"
+
+  #include "/lib/common/data/BlockID.glsl"
+  #include "/lib/common/data/Material.glsl"
 #endif

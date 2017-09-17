@@ -5,18 +5,28 @@
   Before editing anything in this file, please read "License.txt" at the root of the pack.
 */
 
-#ifndef INT_INCLUDED_FUNCTION
-  #define INT_INCLUDED_FUNCTION
+#ifndef INT_INCLUDED_SYNTAX_FUNCTION
+  #define INT_INCLUDED_SYNTAX_FUNCTION
 
-  float toGamma(in float f) { return pow(f, gammaCurveRCP); }
-  vec2 toGamma(in vec2 f) { return pow(f, vec2(gammaCurveRCP)); }
-  vec3 toGamma(in vec3 f) { return pow(f, vec3(gammaCurveRCP)); }
-  vec4 toGamma(in vec4 f) { return pow(f, vec4(gammaCurveRCP)); }
+  float toGamma(in float f) { return pow(f, screenGammaCurveRCP); }
+  vec2 toGamma(in vec2 f) { return pow(f, vec2(screenGammaCurveRCP)); }
+  vec3 toGamma(in vec3 f) { return pow(f, vec3(screenGammaCurveRCP)); }
+  vec4 toGamma(in vec4 f) { return pow(f, vec4(screenGammaCurveRCP)); }
 
-  float toLinear(in float f) { return pow(f, gammaCurve); }
-  vec2 toLinear(in vec2 f) { return pow(f, vec2(gammaCurve)); }
-  vec3 toLinear(in vec3 f) { return pow(f, vec3(gammaCurve)); }
-  vec4 toLinear(in vec4 f) { return pow(f, vec4(gammaCurve)); }
+  float toLinear(in float f) { return pow(f, screenGammaCurve); }
+  vec2 toLinear(in vec2 f) { return pow(f, vec2(screenGammaCurve)); }
+  vec3 toLinear(in vec3 f) { return pow(f, vec3(screenGammaCurve)); }
+  vec4 toLinear(in vec4 f) { return pow(f, vec4(screenGammaCurve)); }
+
+  float toGamma(in float f, in float curve) { return pow(f, curve); }
+  vec2 toGamma(in vec2 f, in float curve) { return pow(f, vec2(curve)); }
+  vec3 toGamma(in vec3 f, in float curve) { return pow(f, vec3(curve)); }
+  vec4 toGamma(in vec4 f, in float curve) { return pow(f, vec4(curve)); }
+
+  float toLinear(in float f, in float curve) { return pow(f, curve); }
+  vec2 toLinear(in vec2 f, in float curve) { return pow(f, vec2(curve)); }
+  vec3 toLinear(in vec3 f, in float curve) { return pow(f, vec3(curve)); }
+  vec4 toLinear(in vec4 f, in float curve) { return pow(f, vec4(curve)); }
 
   float toLDR(in float f, in float range) { return toGamma(f * range); }
   vec2 toLDR(in vec2 f, in float range) { return toGamma(f * range); }
@@ -36,4 +46,18 @@
 
   #define toFogLDR(col) toLDR(col, dynamicRangeFogRCP)
   #define toFogHDR(col) toHDR(col, dynamicRangeFog)
+
+  float flengthsqr(in vec2 n) { return dot(n, n); }
+  float flengthsqr(in vec3 n) { return dot(n, n); }
+  float flengthsqr(in vec4 n) { return dot(n, n); }
+
+  float flength(in vec2 n) { return sqrt(flengthsqr(n)); }
+  float flength(in vec3 n) { return sqrt(flengthsqr(n)); }
+  float flength(in vec4 n) { return sqrt(flengthsqr(n)); }
+
+  float flengthinv(in vec3 n) { return inversesqrt(flengthsqr(n)); }
+
+  vec3 fnormalize(in vec3 n) { return n * flengthinv(n); }
+
+  bool comparef(in float a, in float b, const in float width) { return abs(a - b) < width; }
 #endif

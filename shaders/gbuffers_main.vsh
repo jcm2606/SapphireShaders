@@ -1,0 +1,79 @@
+/*
+  SAPPHIRE BASE.
+  JCM2606.
+
+  Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
+*/
+
+// CONST
+// VARYING
+varying mat3 ttn;
+
+varying vec4 coordinates;
+varying vec4 colour;
+varying vec4 parallaxVector;
+
+varying vec3 world;
+varying vec3 normal;
+varying vec3 vertex;
+
+flat(vec2) entity;
+
+flat(float) material;
+varying float vertexDistance;
+
+#define uvcoord coordinates.xy
+#define lmcoord coordinates.zw
+
+// UNIFORM
+attribute vec4 mc_Entity;
+attribute vec4 mc_midTexCoord;
+attribute vec4 at_tangent;
+
+uniform vec3 cameraPosition;
+
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+
+// STRUCT
+// ARBITRARY
+// INCLUDES
+// MAIN
+void main() {
+  colour = gl_Color;
+
+  uvcoord = (gl_TextureMatrix[0] * gl_MultiTexCoord0).xy;
+  lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
+
+  normal = fnormalize(gl_NormalMatrix * gl_Normal);
+
+  entity = mc_Entity.xz;
+
+  #include "/lib/gbuffer/Materials.glsl"
+
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_WATER
+    vec3 position = deprojectVertex(gbufferModelViewInverse, gl_ModelViewMatrix, gl_Vertex.xyz);
+
+    world = position + cameraPosition;
+  #endif
+
+  // FEATURE: Vertex deformation.
+  // FEATURE: Waving terrain.
+
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_WATER
+    gl_Position = reprojectVertex(gbufferModelView, position.xyz);
+  #else
+    gl_Position = reprojectVertex(gl_ModelViewMatrix, gl_Vertex.xyz);
+  #endif
+
+  vertex = (gl_ModelViewMatrix * gl_Vertex).xyz;
+
+  ttn = mat3(
+    fnormalize(gl_NormalMatrix * at_tangent.xyz),
+    fnormalize(gl_NormalMatrix * cross(at_tangent.xyz, gl_Normal.xyz) * at_tangent.w),
+    normal
+  );
+}
+
+#undef uvcoord
+#undef lmcoord

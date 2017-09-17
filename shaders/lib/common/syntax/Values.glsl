@@ -5,8 +5,8 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#ifndef INT_INCLUDED_VALUES
-  #define INT_INCLUDED_VALUES
+#ifndef INT_INCLUDED_SYNTAX_VALUES
+  #define INT_INCLUDED_SYNTAX_VALUES
 
   c(float) pi = 3.14159265358979;
   cRCP(float, pi);
@@ -17,9 +17,15 @@
   c(float) phi = 1.61803398875;
   cRCP(float, phi);
 
-  c(float) ubyteMax = 255.0;
+  c(float) ubyteMax = exp2(8);
   cRCP(float, ubyteMax);
-  
-  c(float) uhalfMax = 65535.0;
+
+  c(float) uhalfMax = exp2(16);
   cRCP(float, uhalfMax);
+
+  c(float) uintMax = exp2(32);
+  cRCP(float, uintMax);
+
+  c(float) ulongMax = exp2(64);
+  cRCP(float, ulongMax);
 #endif
