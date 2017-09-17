@@ -5,8 +5,8 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#ifndef INT_INCLUDED_MATRIX
-  #define INT_INCLUDED_MATRIX
+#ifndef INT_INCLUDED_SYNTAX_MATRIX
+  #define INT_INCLUDED_SYNTAX_MATRIX
 
   #define transMAD(mat, v) (mat3(mat) * (v) + (mat)[3].xyz)
 
@@ -16,4 +16,7 @@
 
   #define projMAD3(mat, v) (diagonal3(mat) * (v) + (mat)[3].xyz )
   #define projMAD4(mat, v) (diagonal4(mat) * (v) + (mat)[3].xyzw)
+  
+  #define deprojectVertex(mat1, mat2, v) (transMAD(mat1, transMAD(mat2, v)))
+  #define reprojectVertex(mat, v) (transMAD(mat, v).xyzz * diagonal4(gl_ProjectionMatrix) + gl_ProjectionMatrix[3])
 #endif

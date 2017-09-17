@@ -5,8 +5,8 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#ifndef INT_INCLUDED_POW
-  #define INT_INCLUDED_POW
+#ifndef INT_INCLUDED_SYNTAX_POW
+  #define INT_INCLUDED_SYNTAX_POW
 
   #define powi(n, i) pow##i(n)
 

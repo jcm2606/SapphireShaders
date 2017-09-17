@@ -5,8 +5,8 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#ifndef INT_INCLUDED_BUFFER
-  #define INT_INCLUDED_BUFFER
+#ifndef INT_INCLUDED_STRUCT_BUFFER
+  #define INT_INCLUDED_STRUCT_BUFFER
 
   struct Buffer {
     vec4 tex0;

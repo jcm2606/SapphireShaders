@@ -16,33 +16,47 @@
 
 // CONST
 // USED BUFFERS
-#define IN_TEX0
+#define IN_TEX1
+#define IN_TEX2
+#define IN_TEX3
+#define IN_TEX4
 
 // VARYING
 varying vec2 texcoord;
 
 // UNIFORM
-uniform sampler2D colortex0;
+uniform sampler2D colortex1;
+uniform sampler2D colortex2;
+uniform sampler2D colortex3;
+uniform sampler2D colortex4;
 
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"
 #include "/lib/composite/struct/StructSurface.glsl"
+#include "/lib/composite/struct/StructMaterial.glsl"
 
 NewBufferObject(buffers);
 NewSurfaceObject(backSurface);
 NewSurfaceObject(frontSurface);
+NewMaterialObject(backMaterial);
+NewMaterialObject(frontMaterial);
 
 // ARBITRARY
 // INCLUDES
-#include "/lib/common/util/Encoding.glsl"
-
 // MAIN
 void main() {
   populateBufferObject(buffers, texcoord);
+  populateSurfaces(backSurface, frontSurface, buffers, true, true);
+  populateMaterials(backMaterial, frontMaterial, backSurface, frontSurface, true, true);
 
-  buffers.tex0.rgb = toFrameHDR(buffers.tex0.rgb);
+  mat2x3 frame = mat2x3(
+    backSurface.albedo,
+    frontSurface.albedo
+  );
 
-  buffers.tex0.rgb = toFrameLDR(buffers.tex0.rgb);
+  buffers.tex0.rgb  = frame[0];
+  buffers.tex0.rgb *= (any(greaterThan(frame[1], vec3(0.0)))) ? frame[1] : vec3(1.0);
+  buffers.tex0.rgb  = toFrameLDR(buffers.tex0.rgb);
 
 /* DRAWBUFFERS:0 */
   gl_FragData[0] = buffers.tex0;

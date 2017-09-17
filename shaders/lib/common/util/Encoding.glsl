@@ -5,25 +5,26 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#ifndef INT_INCLUDED_ENCODING
-  #define INT_INCLUDED_ENCODING
+#ifndef INT_INCLUDED_UTIL_ENCODING
+  #define INT_INCLUDED_UTIL_ENCODING
 
   // 3xNf / COLOUR
   c(vec3) values = exp2(vec3(5.0, 6.0, 5.0));
   c(vec3) maxValues = values - 1.0;
   cRCP(vec3, maxValues);
   c(vec3) positions = vec3(1.0, values.x, values.x * values.y);
-  cRCP(vec3, positions);
+  c(vec3) uhalfMaxOverPositions = uhalfMax / positions;
 
-  float encodeColour(in vec3 c) {
-    // TODO: Add a dither here. Just uncomment the line below.
-    //c += (bayer8(gl_FragCoord.xy) - 0.5) * maxValuesRCP;
-    c = clamp01(c);
-    return dot(round(c * maxValues), positions) * uhalfMaxRCP;
+  float encodeColour(in vec3 colour) {
+    // TODO: Add a dither.
+    // colour += (bayer8(gl_FragCoord.xy) - 0.5) * maxValuesRCP;
+    colour = clamp01(colour);
+
+    return dot(round(colour * maxValues), positions) * uhalfMaxRCP;
   }
 
-  vec3 decodeColor(in float f) {
-    return mod(f * positionsRCP, values) * maxValuesRCP;
+  vec3 decodeColour(in float encoded) {
+    return mod(encoded * uhalfMaxOverPositions, values) * maxValuesRCP;
   }
 
   // 2x8f
