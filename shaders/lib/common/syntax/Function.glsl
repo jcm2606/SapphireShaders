@@ -62,4 +62,11 @@
   bool comparef(in float a, in float b, const in float width) { return abs(a - b) < width; }
 
   bool checkNAN(in float f) { return (f < 0.0 || 0.0 < f || f == 0.0) ? false : true; }
+
+  float cflattenf(in float f, c(in float) weight) { c(float) weightInverse = 1.0 - weight; return f * weight + weightInverse; }
+  vec2 cflatten2(in vec2 f, c(in float) weight) { c(float) weightInverse = 1.0 - weight; return f * weight + weightInverse; }
+  vec3 cflatten3(in vec3 f, c(in float) weight) { c(float) weightInverse = 1.0 - weight; return f * weight + weightInverse; }
+  vec4 cflatten4(in vec4 f, c(in float) weight) { c(float) weightInverse = 1.0 - weight; return f * weight + weightInverse; }
+
+  float compareShadow(in float depth, in float comparison) { return clamp01(1.0 - max0(comparison - depth) * float(shadowMapResolution)); }
 #endif

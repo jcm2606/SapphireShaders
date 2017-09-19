@@ -5,74 +5,74 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#if !defined(INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP) && SHADER == GBUFFERS_TERRAIN
+#ifndef INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
   #define INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
 
-  #if 0
-    vec2 getLightmapShading(in vec2 lightmap, in vec3 vertexNormal, in vec3 tangentNormal, in mat3 tbn) {
-      if(comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) return lightmap;
-      
+  vec2 getLightmapShading(in vec2 lightmap, in vec3 surfaceNormal, c(in float) steepness) {
+    c(float) maxBrightness = 0.0625;
+    c(float) maxBrightnessNoShading = maxBrightness * 6.55;
+
+    #ifndef LIGHTMAPS_SHADING
+      return vec2(maxBrightnessNoShading);
+    #elif SHADER != GBUFFERS_TERRAIN && SHADER != GBUFFERS_HAND
+      return vec2(maxBrightnessNoShading);
+    #else
       vec2 shading = lightmap;
 
       #define blockShading shading.x
       #define skyShading shading.y
 
-      mat2x3 tangents = mat2x3(
-        cross(gbufferModelViewInverse[1].xyz, tbn[2]),
-        cross(tbn[2], gbufferModelViewInverse[0].xyz)
+      c(float) a = 256.0;
+      mat2 lights = mat2(
+        vec2(dFdx(blockShading), dFdy(blockShading)) * a,
+        vec2(dFdx(skyShading), dFdy(skyShading)) * a
       );
 
-      vec2 derivatives = vec2(dFdx(blockShading), dFdy(blockShading));
+      #define lightBlock lights[0]
+      #define lightSky lights[1]
 
-      derivatives = (derivatives == vec2(0.0)) ? vec2(1.0) : derivatives;
+      vec3 T = fnormalize(dFdx(vertex));
+      vec3 B = fnormalize(dFdy(vertex));
+      vec3 N = cross(T, B);
 
-      vec3 L = tangents * derivatives;
+      c(float) b = 0.0005;
+      mat2x3 tangentLights = mat2x3(
+        fnormalize(vec3(lightBlock.x * T + (b * N + (lightBlock.y * B)))),
+        fnormalize(vec3(lightSky.x * T + (b * N + (lightSky.y * B))))
+      );
 
-      L = normalize(L + tbn[2] * length(derivatives));
+      #define tangentLightBlock tangentLights[0]
+      #define tangentLightSky tangentLights[1]
 
-      blockShading = max0(dot(L, tangentNormal));
+      blockShading = clamp01(dot(surfaceNormal, tangentLightBlock));
+      skyShading = clamp01(dot(surfaceNormal, tangentLightSky));
+
+      c(float) threshold = 0.1;
+      blockShading = (blockShading > threshold) ? maxBrightness : blockShading;
+      skyShading = (skyShading > threshold) ? maxBrightness : skyShading;
+
+      #undef tangentLightBlock
+      #undef tangentLightSky
+
+      #undef lightBlock
+      #undef lightSky
 
       #undef blockShading
       #undef skyShading
 
-      return shading;
-    }
-  #else
-    vec2 getLightmapShading(in vec2 lightmap, in vec3 vertexNormal, in vec3 tangentNormal, in mat3 tbn) {
-      if(comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) return lightmap;
+      return cflatten2(shading, steepness);
+    #endif
+  }
 
-      mat2x3 tangents = mat2x3(0.0);
+  vec2 getLightmaps(in vec2 lightmap, in vec3 surfaceNormal) {
+    c(float) steepness = 0.55;
+    c(float) strength = 4.075 * steepness;
+    c(float) blockAttenuation = LIGHTMAPS_BLOCK_ATTENUATION;
+    c(float) skyAttenuation = LIGHTMAPS_SKY_ATTENUATION;
+    c(vec2) attenuation = vec2(blockAttenuation, skyAttenuation);
 
-      #define xTangent tangents[0]
-      #define yTangent tangents[1]
+    vec2 shading = getLightmapShading(lightmap, surfaceNormal, steepness);
 
-      xTangent = ttn[1];
-      yTangent = cross(vertexNormal, xTangent);
-
-      vec2 shading = lightmap;
-
-      #define blockShading shading.x
-      #define skyShading shading.y
-
-      mat2 derivatives = mat2(
-        vec2(dFdx(blockShading), dFdy(blockShading)),
-        vec2(dFdx(skyShading), dFdy(skyShading))
-      );
-
-      derivatives[0] = (derivatives[0] == vec2(0.0)) ? vec2(1.0) : derivatives[0];
-      derivatives[1] = (derivatives[1] == vec2(0.0)) ? vec2(1.0) : derivatives[1];
-
-      blockShading = clamp01(dot(fnormalize(xTangent * derivatives[0].x + (yTangent * derivatives[0].y)), tangentNormal));
-
-      skyShading = clamp01(dot(fnormalize(xTangent * derivatives[1].x + (yTangent * derivatives[1].y)), tangentNormal));
-
-      #undef blockShading
-      #undef skyShading
-
-      #undef xTangent
-      #undef yTangent
-
-      return shading * 0.5 + 0.5;
-    }
-  #endif
+    return pow(lightmap, attenuation) * shading * strength;
+  }
 #endif

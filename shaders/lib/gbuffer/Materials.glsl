@@ -10,7 +10,7 @@
 
   material = MATERIAL_DEFAULT;
 
-  #if   SHADER == GBUFFERS_TERRAIN
+  #if   SHADER == GBUFFERS_TERRAIN || STAGE == SHADOW
     // TERRAIN
     material = MATERIAL_TERRAIN;
 
@@ -70,7 +70,7 @@
     ) ?
       MATERIAL_METAL :
       material;
-  #elif SHADER == GBUFFERS_WATER
+  #elif SHADER == GBUFFERS_WATER || STAGE == SHADOW
     // TRANSPARENT
     material = MATERIAL_TRANSPARENT;
     

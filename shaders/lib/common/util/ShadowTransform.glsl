@@ -12,8 +12,8 @@
 
   mat4 shadowMVP = shadowProjection * shadowModelView * 0.5;
 
-  vec3 getViewPosition(in vec3 world) {
-    return transMAD(shadowMatrix, world) + 0.5;
+  vec3 getShadowPosition(in vec3 world) {
+    return transMAD(shadowMVP, world) + 0.5;
   }
 
   c(float) shadowBias = SHADOW_BIAS;

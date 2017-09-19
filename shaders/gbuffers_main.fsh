@@ -5,6 +5,8 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
+#extension GL_ARB_shader_texture_lod : enable
+
 // CONST
 // VARYING
 varying mat3 ttn;
@@ -16,11 +18,12 @@ varying vec4 parallaxVector;
 varying vec3 world;
 varying vec3 normal;
 varying vec3 vertex;
+varying vec3 dir;
 
 flat(vec2) entity;
 
 flat(float) material;
-varying float vertexDistance;
+varying float dist;
 
 #define uvcoord coordinates.xy
 #define lmcoord coordinates.zw
@@ -43,27 +46,40 @@ varying float vertexDistance;
 // STRUCT
 // ARBITRARY
 // INCLUDES
+#if 1
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
+    #define textureSample(tex, uv) texture2DGradARB(tex, uv, parallaxDerivatives[0], parallaxDerivatives[1])
+  #else
+    #define textureSample(tex, uv) texture2D(tex, uv)
+  #endif
+#else
+  #define textureSample(tex, uv) texture2D(tex, uv)
+#endif
+
 #include "/lib/common/util/Encoding.glsl"
 
+#include "/lib/gbuffer/Parallax.glsl"
 #include "/lib/gbuffer/DirectionalLightmap.glsl"
 
 // MAIN
 void main() {
+  vec2 texcoord = uvcoord;
+
   mat2x4 buffers = mat2x4(
     vec4(0.0, 0.0, 0.0, 1.0),
     vec4(0.0, 0.0, 0.0, 1.0)
   );
 
-  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WATER
-    mat3 tbn = mat3(
-      ttn[0].x, ttn[1].x, ttn[2].x,
-      ttn[0].y, ttn[1].y, ttn[2].y,
-      ttn[0].z, ttn[1].z, ttn[2].z
-    );
+  mat3 tbn = mat3(
+    ttn[0].x, ttn[1].x, ttn[2].x,
+    ttn[0].y, ttn[1].y, ttn[2].y,
+    ttn[0].z, ttn[1].z, ttn[2].z
+  );
 
-    #if SHADER == GBUFFERS_WATER
-      vec3 view = normalize(tbn * vertex);
-    #endif
+  vec3 view = normalize(tbn * vertex);
+
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
+    texcoord = getParallax(view);
   #endif
 
   #define albedoBuffer buffers[0].x

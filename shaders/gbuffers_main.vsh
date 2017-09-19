@@ -16,11 +16,13 @@ varying vec4 parallaxVector;
 varying vec3 world;
 varying vec3 normal;
 varying vec3 vertex;
+varying vec3 dir;
 
 flat(vec2) entity;
+varying vec2 pcoord;
 
 flat(float) material;
-varying float vertexDistance;
+varying float dist;
 
 #define uvcoord coordinates.xy
 #define lmcoord coordinates.zw
@@ -49,6 +51,15 @@ void main() {
 
   entity = mc_Entity.xz;
 
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
+    vec2 mid = (gl_TextureMatrix[0] * mc_midTexCoord).xy;
+    vec2 uvMinusMid = gl_MultiTexCoord0.xy - mid;
+    parallaxVector.zw = abs(uvMinusMid) * 2.0;
+    parallaxVector.xy = min(uvcoord, mid - uvMinusMid);
+
+    uvcoord = sign(uvMinusMid) * 0.5 + 0.5;
+  #endif
+
   #include "/lib/gbuffer/Materials.glsl"
 
   #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_WATER
@@ -68,11 +79,15 @@ void main() {
 
   vertex = (gl_ModelViewMatrix * gl_Vertex).xyz;
 
-  ttn = mat3(
-    fnormalize(gl_NormalMatrix * at_tangent.xyz),
-    fnormalize(gl_NormalMatrix * cross(at_tangent.xyz, gl_Normal.xyz) * at_tangent.w),
-    normal
-  );
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
+    dist = flength(vertex);  
+  #endif
+
+  ttn = mat3(0.0);
+
+  ttn[0] = normalize(gl_NormalMatrix * at_tangent.xyz);
+  ttn[1] = cross(ttn[0], normal);
+  ttn[2] = normal;
 }
 
 #undef uvcoord
