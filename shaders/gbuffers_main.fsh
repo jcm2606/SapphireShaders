@@ -37,12 +37,15 @@ varying float vertexDistance;
 
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
+  uniform mat4 gbufferModelViewInverse;
 #endif
 
 // STRUCT
 // ARBITRARY
 // INCLUDES
 #include "/lib/common/util/Encoding.glsl"
+
+#include "/lib/gbuffer/DirectionalLightmap.glsl"
 
 // MAIN
 void main() {
