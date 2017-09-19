@@ -5,74 +5,65 @@
   Before editing anything in this file, please read "LICENSE.txt" at the root of the pack.
 */
 
-#if !defined(INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP) && SHADER == GBUFFERS_TERRAIN
+#ifndef INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
   #define INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
 
-  #if 0
-    vec2 getLightmapShading(in vec2 lightmap, in vec3 vertexNormal, in vec3 tangentNormal, in mat3 tbn) {
-      if(comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) return lightmap;
-      
+  vec2 getLightmapShading(in vec2 lightmap, in vec3 surfaceNormal) {
+    c(float) maxBrightness = 0.0625;
+
+    #if SHADER != GBUFFERS_TERRAIN || !defined(LIGHTMAPS_SHADING)
+      return vec2(maxBrightness * 6.55);
+    #else
       vec2 shading = lightmap;
 
       #define blockShading shading.x
       #define skyShading shading.y
 
-      mat2x3 tangents = mat2x3(
-        cross(gbufferModelViewInverse[1].xyz, tbn[2]),
-        cross(tbn[2], gbufferModelViewInverse[0].xyz)
+      mat2 lights = mat2(
+        vec2(dFdx(blockShading), dFdy(blockShading)) * 120.0,
+        vec2(dFdx(skyShading), dFdy(skyShading)) * 120.0
       );
 
-      vec2 derivatives = vec2(dFdx(blockShading), dFdy(blockShading));
+      #define lightBlock lights[0]
+      #define lightSky lights[1]
 
-      derivatives = (derivatives == vec2(0.0)) ? vec2(1.0) : derivatives;
+      c(float) a = 0.0005;
+      mat2x3 tangentLights = mat2x3(
+        fnormalize(vec3(lightBlock.x * ttn[0] + (a * normal + (lightBlock.y * ttn[1])))),
+        fnormalize(vec3(lightSky.x * ttn[0] + (a * normal + (lightSky.y * ttn[1]))))
+      );
 
-      vec3 L = tangents * derivatives;
+      #define tangentLightBlock tangentLights[0]
+      #define tangentLightSky tangentLights[1]
 
-      L = normalize(L + tbn[2] * length(derivatives));
+      blockShading = clamp01(dot(surfaceNormal, tangentLightBlock));
+      skyShading = clamp01(dot(surfaceNormal, tangentLightSky));
 
-      blockShading = max0(dot(L, tangentNormal));
+      c(float) threshold = 0.1;
+      blockShading = (blockShading > threshold) ? maxBrightness : blockShading;
+      skyShading = (skyShading > threshold) ? maxBrightness : skyShading;
+
+      #undef tangentLightBlock
+      #undef tangentLightSky
+
+      #undef lightBlock
+      #undef lightSky
 
       #undef blockShading
       #undef skyShading
 
-      return shading;
-    }
-  #else
-    vec2 getLightmapShading(in vec2 lightmap, in vec3 vertexNormal, in vec3 tangentNormal, in mat3 tbn) {
-      if(comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) return lightmap;
+      return (shading * 0.75 + 0.25);
+    #endif
+  }
 
-      mat2x3 tangents = mat2x3(0.0);
+  vec2 getLightmaps(in vec2 lightmap, in vec3 surfaceNormal) {
+    c(float) strength = 2.75;
+    c(float) blockAttenuation = LIGHTMAPS_BLOCK_ATTENUATION;
+    c(float) skyAttenuation = LIGHTMAPS_SKY_ATTENUATION;
+    c(vec2) attenuation = vec2(blockAttenuation, skyAttenuation);
 
-      #define xTangent tangents[0]
-      #define yTangent tangents[1]
+    vec2 shading = getLightmapShading(lightmap, surfaceNormal);
 
-      xTangent = ttn[1];
-      yTangent = cross(vertexNormal, xTangent);
-
-      vec2 shading = lightmap;
-
-      #define blockShading shading.x
-      #define skyShading shading.y
-
-      mat2 derivatives = mat2(
-        vec2(dFdx(blockShading), dFdy(blockShading)),
-        vec2(dFdx(skyShading), dFdy(skyShading))
-      );
-
-      derivatives[0] = (derivatives[0] == vec2(0.0)) ? vec2(1.0) : derivatives[0];
-      derivatives[1] = (derivatives[1] == vec2(0.0)) ? vec2(1.0) : derivatives[1];
-
-      blockShading = clamp01(dot(fnormalize(xTangent * derivatives[0].x + (yTangent * derivatives[0].y)), tangentNormal));
-
-      skyShading = clamp01(dot(fnormalize(xTangent * derivatives[1].x + (yTangent * derivatives[1].y)), tangentNormal));
-
-      #undef blockShading
-      #undef skyShading
-
-      #undef xTangent
-      #undef yTangent
-
-      return shading * 0.5 + 0.5;
-    }
-  #endif
+    return pow(lightmap, attenuation) * shading * strength;
+  }
 #endif

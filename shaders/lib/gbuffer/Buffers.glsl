@@ -10,7 +10,7 @@
 
   // SAMPLE NORMAL MAP
   #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
-    vec4 normalMap = texture2D(normals, uvcoord);
+    vec4 normalMap = textureSample(normals, texcoord);
   #endif
 
   // PUDDLES
@@ -43,11 +43,11 @@
 
   // ALBEDO
   #if   SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
-    vec4 albedo = texture2D(texture, uvcoord) * colour;
+    vec4 albedo = textureSample(texture, texcoord) * colour;
   #elif SHADER == GBUFFERS_TEXTURED || SHADER == GBUFFERS_TEXTURED_LIT || SHADER == GBUFFERS_SKY_TEXTURED || SHADER == GBUFFERS_CLOUDS || SHADER == GBUFFERS_BEAM || SHADER == GBUFFERS_GLINT || SHADER == GBUFFERS_EYES || SHADER == GBUFFERS_WEATHER || SHADER == GBUFFERS_ENTITIES
-    vec4 albedo = texture2D(texture, uvcoord) * colour;
+    vec4 albedo = textureSample(texture, texcoord) * colour;
   #elif SHADER == GBUFFERS_WATER
-    vec4 albedo = texture2D(texture, uvcoord) * colour;
+    vec4 albedo = textureSample(texture, texcoord) * colour;
   #elif SHADER == GBUFFERS_SKY_BASIC
     vec4 albedo = colour;
   #elif SHADER == GBUFFERS_BASIC
@@ -57,9 +57,14 @@
   // VANILLA LIGHTMAP
   #ifdef VANILLA_LIGHTING
     #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_WATER || SHADER == GBUFFERS_ENTITIES || SHADER == GBUFFERS_WEATHER || SHADER == GBUFFERS_TEXTURED_LIT
-      albedo.rgb *= texture2D(lightmap, lmcoord).rgb;
+      albedo.rgb *= textureSample(lightmap, lmcoord).rgb;
     #endif
   #endif
+
+  vec2 lightmaps = getLightmaps(lmcoord, surfaceNormal);
+
+  if(lightmaps.x > 1.0) albedo.rgb = vec3(1.0, 0.0, 0.0);
+  if(lightmaps.y > 1.0) albedo.rgb = vec3(0.0, 1.0, 0.0);
 
   // COMMIT ALBEDO TO BUFFER
   albedoBuffer = encodeColour(toGamma(albedo.rgb));
@@ -75,13 +80,7 @@
   buffers[1].a = buffers[0].a;
 
   // LIGHTMAP SCALARS
-  lightmapBuffer = encode2x8(
-    #if SHADER == GBUFFERS_TERRAIN && defined(SHADING_LIGHTMAP)
-      lmcoord
-    #else
-      lmcoord
-    #endif
-  );
+  lightmapBuffer = encode2x8(getLightmaps(lmcoord, surfaceNormal));
 
   // MATERIAL
   materialBuffer = material;
@@ -100,21 +99,25 @@
   #define porosity surfaceProperties.w
 
   #if   SHADER == GBUFFERS_TERRAIN
-    vec4 specularMap = texture2D(specular, uvcoord);
+    vec4 specularMap = textureSample(specular, texcoord);
 
     #if   RESOURCE_FORMAT == 0
+      // Specular pack. Uses a hardcoded metalness mask to determine f0, also uses a hardcoded emissive mask to determine emission.
       smoothness = specularMap.x;
       f0 = (comparef(material, MATERIAL_METAL, ubyteMaxRCP)) ? f0Metal : f0Dielectric;
       emission = (comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) ? 1.0 : 0.0;
     #elif RESOURCE_FORMAT == 1
+      // Old PBR pack. Uses metalness mask from texture to determine f0. Uses a hardcoded emissive mask to determine emission.
       smoothness = specularMap.x;
       f0 = mix(f0Dielectric, f0Metal, specularMap.y);
       emission = (comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) ? 1.0 : 0.0;
     #elif RESOURCE_FORMAT == 2
+      // Old PBR pack, w/ emissive support. Uses metalness mask and emissive mask from texture.
       smoothness = specularMap.x;
       f0 = mix(f0Dielectric, f0Metal, specularMap.y);
       emission = specularMap.z;
     #elif RESOURCE_FORMAT == 3
+      // New PBR pack. Everything comes from texture.
       smoothness = specularMap.z;
       f0 = specularMap.x;
       emission = (comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) ? specularMap.w : 0.0;
