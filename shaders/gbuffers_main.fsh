@@ -70,15 +70,13 @@ void main() {
     vec4(0.0, 0.0, 0.0, 1.0)
   );
 
-  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WATER
-    mat3 tbn = mat3(
-      ttn[0].x, ttn[1].x, ttn[2].x,
-      ttn[0].y, ttn[1].y, ttn[2].y,
-      ttn[0].z, ttn[1].z, ttn[2].z
-    );
+  mat3 tbn = mat3(
+    ttn[0].x, ttn[1].x, ttn[2].x,
+    ttn[0].y, ttn[1].y, ttn[2].y,
+    ttn[0].z, ttn[1].z, ttn[2].z
+  );
 
-    vec3 view = normalize(tbn * vertex);
-  #endif
+  vec3 view = normalize(tbn * vertex);
 
   #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
     texcoord = getParallax(view);

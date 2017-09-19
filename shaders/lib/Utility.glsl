@@ -8,6 +8,8 @@
 #ifndef INT_INCLUDED_UTILITY
   #define INT_INCLUDED_UTILITY
 
+  #include "/lib/common/debugging/DebugFrame.glsl"
+
   #include "/lib/common/data/BlockID.glsl"
   #include "/lib/common/data/Material.glsl"
 

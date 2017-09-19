@@ -8,29 +8,37 @@
 #ifndef INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
   #define INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
 
-  vec2 getLightmapShading(in vec2 lightmap, in vec3 surfaceNormal) {
+  vec2 getLightmapShading(in vec2 lightmap, in vec3 surfaceNormal, c(in float) steepness) {
     c(float) maxBrightness = 0.0625;
+    c(float) maxBrightnessNoShading = maxBrightness * 6.55;
 
-    #if SHADER != GBUFFERS_TERRAIN || !defined(LIGHTMAPS_SHADING)
-      return vec2(maxBrightness * 6.55);
+    #ifndef LIGHTMAPS_SHADING
+      return vec2(maxBrightnessNoShading);
+    #elif SHADER != GBUFFERS_TERRAIN && SHADER != GBUFFERS_HAND
+      return vec2(maxBrightnessNoShading);
     #else
       vec2 shading = lightmap;
 
       #define blockShading shading.x
       #define skyShading shading.y
 
+      c(float) a = 256.0;
       mat2 lights = mat2(
-        vec2(dFdx(blockShading), dFdy(blockShading)) * 120.0,
-        vec2(dFdx(skyShading), dFdy(skyShading)) * 120.0
+        vec2(dFdx(blockShading), dFdy(blockShading)) * a,
+        vec2(dFdx(skyShading), dFdy(skyShading)) * a
       );
 
       #define lightBlock lights[0]
       #define lightSky lights[1]
 
-      c(float) a = 0.0005;
+      vec3 T = fnormalize(dFdx(vertex));
+      vec3 B = fnormalize(dFdy(vertex));
+      vec3 N = cross(T, B);
+
+      c(float) b = 0.0005;
       mat2x3 tangentLights = mat2x3(
-        fnormalize(vec3(lightBlock.x * ttn[0] + (a * normal + (lightBlock.y * ttn[1])))),
-        fnormalize(vec3(lightSky.x * ttn[0] + (a * normal + (lightSky.y * ttn[1]))))
+        fnormalize(vec3(lightBlock.x * T + (b * N + (lightBlock.y * B)))),
+        fnormalize(vec3(lightSky.x * T + (b * N + (lightSky.y * B))))
       );
 
       #define tangentLightBlock tangentLights[0]
@@ -52,17 +60,18 @@
       #undef blockShading
       #undef skyShading
 
-      return (shading * 0.75 + 0.25);
+      return cflatten2(shading, steepness);
     #endif
   }
 
   vec2 getLightmaps(in vec2 lightmap, in vec3 surfaceNormal) {
-    c(float) strength = 2.75;
+    c(float) steepness = 0.55;
+    c(float) strength = 4.075 * steepness;
     c(float) blockAttenuation = LIGHTMAPS_BLOCK_ATTENUATION;
     c(float) skyAttenuation = LIGHTMAPS_SKY_ATTENUATION;
     c(vec2) attenuation = vec2(blockAttenuation, skyAttenuation);
 
-    vec2 shading = getLightmapShading(lightmap, surfaceNormal);
+    vec2 shading = getLightmapShading(lightmap, surfaceNormal, steepness);
 
     return pow(lightmap, attenuation) * shading * strength;
   }

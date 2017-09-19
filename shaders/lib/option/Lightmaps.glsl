@@ -6,7 +6,7 @@
 */
 
 #ifndef INT_INCLUDED_OPTION_LIGHTMAPS
-  #define LIGHTMAPS_SHADING
+  #define LIGHTMAPS_SHADING // When enabled, lightmaps on blocks will use diffuse shading to simulate directional lighting.
   #ifdef LIGHTMAPS_SHADING // Required for the damn option to show up in Optifine.
   #endif
 
