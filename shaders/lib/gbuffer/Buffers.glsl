@@ -16,6 +16,31 @@
   // PUDDLES
   // FEATURE: Puddles.
 
+  // NORMAL
+  vec3 surfaceNormal = normal;
+
+  #if   SHADER == GBUFFERS_TERRAIN
+    float normalMaxAngle = mix(NORMAL_ANGLE_SOLID, NORMAL_ANGLE_WET, 0.0); // TODO: If you add puddles, change the 0.0 here to the puddle scalar.
+
+    surfaceNormal = normalMap.xyz * 2.0 - 1.0;
+  #elif SHADER == GBUFFERS_HAND
+    c(float) normalMaxAngle = NORMAL_ANGLE_SOLID;
+
+    surfaceNormal = normalMap.xyz * 2.0 - 1.0;
+  #elif SHADER == GBUFFERS_WATER
+    c(float) normalMaxAngle = NORMAL_ANGLE_TRANSPARENT;
+
+    surfaceNormal = vec3(0.0, 0.0, 1.0);
+  #endif
+
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WATER
+    surfaceNormal  = surfaceNormal * vec3(normalMaxAngle) + vec3(0.0, 0.0, 1.0 - normalMaxAngle);
+    surfaceNormal *= tbn;
+    surfaceNormal  = fnormalize(surfaceNormal);
+  #endif
+
+  normalBuffer = encodeNormal(surfaceNormal);
+
   // ALBEDO
   #if   SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
     vec4 albedo = texture2D(texture, uvcoord) * colour;
@@ -50,35 +75,16 @@
   buffers[1].a = buffers[0].a;
 
   // LIGHTMAP SCALARS
-  lightmapBuffer = encode2x8(lmcoord);
+  lightmapBuffer = encode2x8(
+    #if SHADER == GBUFFERS_TERRAIN && defined(SHADING_LIGHTMAP)
+      lmcoord
+    #else
+      lmcoord
+    #endif
+  );
 
   // MATERIAL
   materialBuffer = material;
-
-  // NORMAL
-  vec3 surfaceNormal = normal;
-
-  #if   SHADER == GBUFFERS_TERRAIN
-    float normalMaxAngle = mix(NORMAL_ANGLE_SOLID, NORMAL_ANGLE_WET, 0.0); // TODO: If you add puddles, change the 0.0 here to the puddle scalar.
-
-    surfaceNormal = normalMap.xyz * 2.0 - 1.0;
-  #elif SHADER == GBUFFERS_HAND
-    c(float) normalMaxAngle = NORMAL_ANGLE_SOLID;
-
-    surfaceNormal = normalMap.xyz * 2.0 - 1.0;
-  #elif SHADER == GBUFFERS_WATER
-    c(float) normalMaxAngle = NORMAL_ANGLE_TRANSPARENT;
-
-    surfaceNormal = vec3(0.0, 0.0, 1.0);
-  #endif
-
-  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WATER
-    surfaceNormal  = surfaceNormal * vec3(normalMaxAngle) + vec3(0.0, 0.0, 1.0 - normalMaxAngle);
-    surfaceNormal *= tbn;
-    surfaceNormal  = fnormalize(surfaceNormal);
-  #endif
-
-  normalBuffer = encodeNormal(surfaceNormal);
 
   // SURFACE PROPERTIES
   vec4 surfaceProperties = vec4(

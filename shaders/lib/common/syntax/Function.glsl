@@ -60,4 +60,6 @@
   vec3 fnormalize(in vec3 n) { return n * flengthinv(n); }
 
   bool comparef(in float a, in float b, const in float width) { return abs(a - b) < width; }
+
+  bool checkNAN(in float f) { return (f < 0.0 || 0.0 < f || f == 0.0) ? false : true; }
 #endif

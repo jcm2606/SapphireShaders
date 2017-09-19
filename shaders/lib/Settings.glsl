@@ -35,6 +35,8 @@
   #include "/lib/option/Surface.glsl"
 
   // OPTIONS
+  //#define SHADING_LIGHTMAP
+
   c(float) screenGammaCurve = 2.2; // [1.0 1.2 1.4 1.6 1.8 2.0 2.2 2.4 2.6 2.8 3.0]
   cRCP(float, screenGammaCurve);
 
@@ -52,4 +54,9 @@
 
   c(float) materialRange = 255.0;
   cRCP(float, materialRange);
+
+  // OPTION DECLARATIONS
+  // Optifine has a weird issue where macro options need to be used with #ifdef to work, so this is required for some options.
+  #ifdef SHADING_LIGHTMAP
+  #endif
 #endif
