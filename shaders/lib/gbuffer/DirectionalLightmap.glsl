@@ -8,7 +8,9 @@
 #ifndef INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
   #define INT_INCLUDED_GBUFFER_DIRECTIONALLIGHTMAP
 
-  vec2 getLightmapShading(in vec2 lightmap, in vec3 surfaceNormal, c(in float) steepness) {
+  #include "/lib/common/util/DiffuseModel.glsl"
+
+  vec2 getLightmapShading(in vec2 lightmap, in vec3 surfaceNormal, in vec3 view, in float roughness, c(in float) steepness) {
     c(float) maxBrightness = 0.0625;
     c(float) maxBrightnessNoShading = maxBrightness * 6.55;
 
@@ -44,8 +46,8 @@
       #define tangentLightBlock tangentLights[0]
       #define tangentLightSky tangentLights[1]
 
-      blockShading = clamp01(dot(surfaceNormal, tangentLightBlock));
-      skyShading = clamp01(dot(surfaceNormal, tangentLightSky));
+      blockShading = LightmapShadingModel(vertex, tangentLightBlock, surfaceNormal, roughness);
+      skyShading = LightmapShadingModel(vertex, tangentLightSky, surfaceNormal, roughness);
 
       c(float) threshold = 0.1;
       blockShading = (blockShading > threshold) ? maxBrightness : blockShading;
@@ -64,14 +66,14 @@
     #endif
   }
 
-  vec2 getLightmaps(in vec2 lightmap, in vec3 surfaceNormal) {
-    c(float) steepness = 0.55;
-    c(float) strength = 4.075 * steepness;
+  vec2 getLightmaps(in vec2 lightmap, in vec3 surfaceNormal, in vec3 view, in float roughness) {
+    c(float) steepness = 0.6;
+    c(float) strength = 3.75 * steepness;
     c(float) blockAttenuation = LIGHTMAPS_BLOCK_ATTENUATION;
     c(float) skyAttenuation = LIGHTMAPS_SKY_ATTENUATION;
     c(vec2) attenuation = vec2(blockAttenuation, skyAttenuation);
 
-    vec2 shading = getLightmapShading(lightmap, surfaceNormal, steepness);
+    vec2 shading = getLightmapShading(lightmap, surfaceNormal, view, roughness, steepness);
 
     return pow(lightmap, attenuation) * shading * strength;
   }
