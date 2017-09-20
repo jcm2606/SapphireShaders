@@ -54,37 +54,6 @@
     vec4 albedo = colour;
   #endif
 
-  // VANILLA LIGHTMAP
-  #ifdef VANILLA_LIGHTING
-    #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_WATER || SHADER == GBUFFERS_ENTITIES || SHADER == GBUFFERS_WEATHER || SHADER == GBUFFERS_TEXTURED_LIT
-      albedo.rgb *= textureSample(lightmap, lmcoord).rgb;
-    #endif
-  #endif
-
-  vec2 lightmaps = getLightmaps(lmcoord, surfaceNormal);
-
-  if(lightmaps.x > 1.0) albedo.rgb = vec3(1.0, 0.0, 0.0);
-  if(lightmaps.y > 1.0) albedo.rgb = vec3(0.0, 1.0, 0.0);
-
-  // COMMIT ALBEDO TO BUFFER
-  albedoBuffer = encodeColour(toGamma(albedo.rgb));
-
-  // SET ALPHA OF BOTH BUFFERS TO ALBEDO ALPHA
-  #if SHADER == GBUFFERS_WATER
-    albedo.a = 1.0;
-  #elif SHADER == GBUFFERS_TEXTURED || SHADER == GBUFFERS_TEXTUREDLIT || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WEATHER
-    albedo.a = sign(albedo.a);
-  #endif
-
-  buffers[0].a = albedo.a;
-  buffers[1].a = buffers[0].a;
-
-  // LIGHTMAP SCALARS
-  lightmapBuffer = encode2x8(getLightmaps(lmcoord, surfaceNormal));
-
-  // MATERIAL
-  materialBuffer = material;
-
   // SURFACE PROPERTIES
   vec4 surfaceProperties = vec4(
     0.0, // Smoothness. Inverted with `1.0 - smoothness` to get roughness.
@@ -136,11 +105,42 @@
 
   smoothness = 1.0 - smoothness;
 
+  surface0Buffer = encode2x8(surfaceProperties.xy);
+  surface1Buffer = encode2x8(surfaceProperties.zw);
+
+  // VANILLA LIGHTMAP
+  #ifdef VANILLA_LIGHTING
+    #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_WATER || SHADER == GBUFFERS_ENTITIES || SHADER == GBUFFERS_WEATHER || SHADER == GBUFFERS_TEXTURED_LIT
+      albedo.rgb *= textureSample(lightmap, lmcoord).rgb;
+    #endif
+  #endif
+
+  vec2 lightmaps = getLightmaps(lmcoord, surfaceNormal, view, smoothness);
+
   #undef smoothness
   #undef f0
   #undef emission
   #undef porosity
 
-  surface0Buffer = encode2x8(surfaceProperties.xy);
-  surface1Buffer = encode2x8(surfaceProperties.zw);
+  if(lightmaps.x > 1.0) albedo.rgb = vec3(1.0, 0.0, 0.0);
+  if(lightmaps.y > 1.0) albedo.rgb = vec3(0.0, 1.0, 0.0);
+
+  // COMMIT ALBEDO TO BUFFER
+  albedoBuffer = encodeColour(toGamma(albedo.rgb));
+
+  // SET ALPHA OF BOTH BUFFERS TO ALBEDO ALPHA
+  #if SHADER == GBUFFERS_WATER
+    albedo.a = 1.0;
+  #elif SHADER == GBUFFERS_TEXTURED || SHADER == GBUFFERS_TEXTUREDLIT || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WEATHER
+    albedo.a = sign(albedo.a);
+  #endif
+
+  buffers[0].a = albedo.a;
+  buffers[1].a = buffers[0].a;
+
+  // LIGHTMAP SCALARS
+  lightmapBuffer = encode2x8(lightmaps);
+
+  // MATERIAL
+  materialBuffer = material;
 #endif
