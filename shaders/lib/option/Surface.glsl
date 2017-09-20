@@ -8,7 +8,7 @@
 #ifndef INT_INCLUDED_OPTION_SURFACE
   #define INT_INCLUDED_OPTION_SURFACE
 
-  #define RESOURCE_FORMAT 0 // [0 1 2 3]
+  #define RESOURCE_FORMAT 1 // [0 1 2 3]
 
   c(float) f0Metal = 0.8;
   c(float) f0Dielectric = 0.02;

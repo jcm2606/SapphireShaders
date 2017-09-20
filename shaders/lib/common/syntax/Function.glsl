@@ -69,4 +69,9 @@
   vec4 cflatten4(in vec4 f, c(in float) weight) { c(float) weightInverse = 1.0 - weight; return f * weight + weightInverse; }
 
   float compareShadow(in float depth, in float comparison) { return clamp01(1.0 - max0(comparison - depth) * float(shadowMapResolution)); }
+
+  c(vec3) lumaCoeff = vec3(0.2125, 0.7154, 0.0721);
+  float getLuma(in vec3 colour) { return dot(colour, lumaCoeff); }
+
+  vec3 saturation(in vec3 colour, in float saturation) { return mix(colour, vec3(getLuma(colour)), saturation); }
 #endif

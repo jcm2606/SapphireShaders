@@ -30,6 +30,9 @@ uniform sampler2D colortex2;
 uniform sampler2D colortex3;
 uniform sampler2D colortex4;
 
+uniform sampler2D depthtex0;
+uniform sampler2D depthtex1;
+
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"
 #include "/lib/composite/struct/StructSurface.glsl"
@@ -43,6 +46,8 @@ NewMaterialObject(frontMaterial);
 
 // ARBITRARY
 // INCLUDES
+#include "/lib/common/debugging/DebugFrame.glsl"
+
 // MAIN
 void main() {
   populateBufferObject(buffers, texcoord);
@@ -54,7 +59,7 @@ void main() {
     frontSurface.albedo
   );
 
-  buffers.tex0.rgb  = frame[0] * (vec3(1.0, 0.1, 0.0) * backSurface.blockLight + backSurface.skyLight);
+  buffers.tex0.rgb  = frame[0] * (vec3(1.0, 0.2, 0.0) * backSurface.blockLight + backSurface.skyLight);
   buffers.tex0.rgb *= (any(greaterThan(frame[1], vec3(0.0)))) ? frame[1] : vec3(1.0);
   buffers.tex0.rgb  = toFrameLDR(buffers.tex0.rgb);
 

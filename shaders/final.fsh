@@ -31,12 +31,17 @@ NewBufferObject(buffers);
 
 // ARBITRARY
 // INCLUDES
+#include "/lib/common/debugging/DebugFrame.glsl"
+
+#include "/lib/final/Tonemap.glsl"
+
 // MAIN
 void main() {
   populateBufferObject(buffers, texcoord);
 
   buffers.tex0.rgb = toFrameHDR(buffers.tex0.rgb);
 
+  buffers.tex0.rgb = tonemap(buffers.tex0.rgb);
   buffers.tex0.rgb = toGamma(buffers.tex0.rgb);
 
   gl_FragColor = buffers.tex0;

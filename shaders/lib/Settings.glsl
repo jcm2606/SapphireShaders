@@ -29,12 +29,14 @@
   const float ambientOcclusionLevel = 0.0f; // This should be set to 0.0f to disable Minecraft's AO. Minecraft's AO breaks the encoding method used for albedo. [0.0f 1.0f]
 
   // OPTION INCLUDES
+  #include "/lib/option/Debugging.glsl"
   #include "/lib/option/Vanilla.glsl"
   #include "/lib/option/Normals.glsl"
   #include "/lib/option/Shadows.glsl"
   #include "/lib/option/Surface.glsl"
   #include "/lib/option/Lightmaps.glsl"
   #include "/lib/option/Parallax.glsl"
+  #include "/lib/option/Post.glsl"
 
   // OPTIONS
   #define GLOBAL_SPEED 1.0 // [0.03125 0.0625 0.125 0.2 0.25 0.4 0.5 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0 4.0 8.0 16.0]
