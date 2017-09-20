@@ -31,6 +31,8 @@ NewBufferObject(buffers);
 
 // ARBITRARY
 // INCLUDES
+#include "/lib/common/debugging/DebugFrame.glsl"
+
 #include "/lib/final/Tonemap.glsl"
 
 // MAIN

@@ -30,6 +30,9 @@ uniform sampler2D colortex2;
 uniform sampler2D colortex3;
 uniform sampler2D colortex4;
 
+uniform sampler2D depthtex0;
+uniform sampler2D depthtex1;
+
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"
 #include "/lib/composite/struct/StructSurface.glsl"
@@ -43,6 +46,8 @@ NewMaterialObject(frontMaterial);
 
 // ARBITRARY
 // INCLUDES
+#include "/lib/common/debugging/DebugFrame.glsl"
+
 // MAIN
 void main() {
   populateBufferObject(buffers, texcoord);

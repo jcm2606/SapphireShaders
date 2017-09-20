@@ -46,12 +46,8 @@ varying float dist;
 // STRUCT
 // ARBITRARY
 // INCLUDES
-#if 1
-  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
-    #define textureSample(tex, uv) texture2DGradARB(tex, uv, parallaxDerivatives[0], parallaxDerivatives[1])
-  #else
-    #define textureSample(tex, uv) texture2D(tex, uv)
-  #endif
+#if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
+  #define textureSample(tex, uv) texture2DGradARB(tex, uv, parallaxDerivatives[0], parallaxDerivatives[1])
 #else
   #define textureSample(tex, uv) texture2D(tex, uv)
 #endif
