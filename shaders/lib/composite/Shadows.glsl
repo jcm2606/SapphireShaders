@@ -80,51 +80,30 @@
 
     for(int i = -shadowQuality; i <= shadowQuality; i++) {
       for(int j = -shadowQuality; j <= shadowQuality; j++) {
-        #if 1
-          mat2 offsets = mat2(
-            vec2(i, j) * widthFront,
-            vec2(i, j) * widthBack
-          );
+        mat2 offsets = mat2(
+          vec2(i, j) * widthFront,
+          vec2(i, j) * widthBack
+        );
 
-          #define offsetFront offsets[0]
-          #define offsetBack offsets[1]
+        #define offsetFront offsets[0]
+        #define offsetBack offsets[1]
 
-          vec3 depths = vec3(
-            texture2D(shadowtex1, distortShadowPosition(offsetBack + shadowPositionBack.xy, 1)).x,
-            texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).x,
-            texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionFront.xy, 1)).x
-          );
+        vec3 depths = vec3(
+          texture2D(shadowtex1, distortShadowPosition(offsetBack + shadowPositionBack.xy, 1)).x,
+          texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).x,
+          texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionFront.xy, 1)).x
+        );
 
-          shadowObject.depth += depths.xy;
+        shadowObject.depth += depths.xy;
 
-          shadowObject.occlusion.x += ceil(compareShadow(depths.x, shadowPositionBack.z));
-          shadowObject.occlusion.y += ceil(compareShadow(depths.y, shadowPositionBack.z));
-          shadowObject.occlusion.z += ceil(compareShadow(depths.z, shadowPositionFront.z));
+        shadowObject.occlusion.x += ceil(compareShadow(depths.x, shadowPositionBack.z));
+        shadowObject.occlusion.y += ceil(compareShadow(depths.y, shadowPositionBack.z));
+        shadowObject.occlusion.z += ceil(compareShadow(depths.z, shadowPositionFront.z));
 
-          shadowObject.colour += texture2D(shadowcolor0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).rgb;
+        shadowObject.colour += texture2D(shadowcolor0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).rgb;
 
-          #undef offsetFront
-          #undef offsetBack
-        #else
-          mat2 offsets = mat2(
-            vec2(i, j) * widthFront,
-            vec2(i, j) * widthBack
-          );
-
-          vec3 depths = vec3(
-            texture2D(shadowtex0, distortShadowPosition(offsets[0] + shadowPositionFront.xy, 1)).x,
-            texture2D(shadowtex0, distortShadowPosition(offsets[0] + shadowPositionBack.xy, 1)).x,
-            texture2D(shadowtex1, distortShadowPosition(offsets[0] + shadowPositionBack.xy, 1)).x
-          );
-
-          shadowObject.depth += depths.yz;
-
-          shadowObject.occlusion.x += ceil(compareShadow(depths.x, shadowPositionFront.z));
-          shadowObject.occlusion.y += ceil(compareShadow(depths.y, shadowPositionBack.z));
-          shadowObject.occlusion.z += ceil(compareShadow(depths.z, shadowPositionBack.z));
-
-          shadowObject.colour += texture2D(shadowcolor0, distortShadowPosition(offsets[0] + shadowPositionBack.xy, 1)).rgb;
-        #endif
+        #undef offsetFront
+        #undef offsetBack
       }
     }
 

@@ -53,6 +53,7 @@ uniform float viewWidth;
 uniform float viewHeight;
 uniform float near;
 uniform float far;
+uniform float rainStrength;
 
 uniform int isEyeInWater;
 
@@ -74,6 +75,8 @@ NewMaterialObject(backMaterial);
 
 #include "/lib/common/util/ShadowTransform.glsl"
 
+#include "/lib/composite/Sky.glsl"
+
 #include "/lib/composite/Shading.glsl"
 
 // MAIN
@@ -89,15 +92,12 @@ void main() {
   buffers.tex0.rgb = backSurface.albedo;
 
   // DRAW SKY
-  // TODO: Sky.
+  buffers.tex0.rgb = drawSky(buffers.tex0.rgb, position.viewPositionBack, 0);
 
-  // CALCULATE ENVIRONMENTAL LIGHTING COLOURS
-  // TODO: Environmental lighting.
+  // CALCULATE ATMOSPHERE LIGHTING COLOURS
+  mat2x3 lighting = mat2x3(0.0);
 
-  mat2x3 lighting = mat2x3(
-    vec3(1.0),
-    vec3(0.6, 0.8, 1.0)
-  );
+  #include "/lib/composite/AtmosphereLighting.glsl"
 
   // PERFORM SHADING ON FRAME
   buffers.tex0.rgb = getShadedFragment(buffers.tex0.rgb, lighting);

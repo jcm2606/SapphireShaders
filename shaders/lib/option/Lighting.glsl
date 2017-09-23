@@ -11,7 +11,7 @@
   #define LIGHTING_BLOCK_COLOUR_PRESET 0 // [0]
 
   #if LIGHTING_BLOCK_COLOUR_PRESET == 0
-    c(vec3) lightingBlock = vec3(1.0, 0.22, 0.0);
+    c(vec3) lightingBlock = vec3(1.0, 0.28, 0.04);
   #endif
 
   #define DirectShadingModel orenNayer // [lambert orenNayer burley]
