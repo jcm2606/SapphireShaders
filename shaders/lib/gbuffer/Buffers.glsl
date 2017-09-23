@@ -142,5 +142,5 @@
   lightmapBuffer = encode2x8(lightmaps);
 
   // MATERIAL
-  materialBuffer = material;
+  materialBuffer = material * materialRangeRCP;
 #endif

@@ -41,7 +41,10 @@ void main() {
 
   buffers.tex0.rgb = toFrameHDR(buffers.tex0.rgb);
 
-  buffers.tex0.rgb = tonemap(buffers.tex0.rgb);
+  #ifndef DEBUGGING
+    buffers.tex0.rgb = tonemap(buffers.tex0.rgb);
+  #endif
+
   buffers.tex0.rgb = toGamma(buffers.tex0.rgb);
 
   gl_FragColor = buffers.tex0;

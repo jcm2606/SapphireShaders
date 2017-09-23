@@ -61,6 +61,8 @@ void main() {
 
   buffers.tex0.rgb  = frame[0] * (vec3(1.0, 0.2, 0.0) * backSurface.blockLight + backSurface.skyLight);
   buffers.tex0.rgb *= (any(greaterThan(frame[1], vec3(0.0)))) ? frame[1] : vec3(1.0);
+  
+  DebugGbuffers();
   buffers.tex0.rgb  = toFrameLDR(buffers.tex0.rgb);
 
 /* DRAWBUFFERS:0 */
