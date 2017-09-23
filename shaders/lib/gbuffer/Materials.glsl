@@ -119,6 +119,4 @@
   #elif SHADER == GBUFFERS_HAND
     material = MATERIAL_HAND;
   #endif
-
-  material *= materialRangeRCP;
 #endif

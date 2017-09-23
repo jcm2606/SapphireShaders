@@ -8,6 +8,8 @@
 #ifndef INT_INCLUDED_OPTION_DEBUGGING
   #define INT_INCLUDED_OPTION_DEBUGGING
 
-  //#define DEBUG_GBUFFERS
-  #define DEBUG_GBUFFERS_STAGE 0 // The stage that gbuffers debugging should act on. Only applies to the composite shaders. [-1 0 1 2 3 4 5 6 7]
+  #define DEBUG_STAGE 0 // The stage that debugging should occur on. [-1 0 1 2 3 4 5 6 7 8]
+  
+  //#define DEBUGGING
+  //#define DEBUG_GBUFFERS // Enables visualisation of the gbuffers output.
 #endif
