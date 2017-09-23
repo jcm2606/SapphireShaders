@@ -8,10 +8,6 @@
 #ifndef INT_INCLUDED_DEBUGGING_DEBUGFRAME
   #define INT_INCLUDED_DEBUGGING_DEBUGFRAME
 
-  vec4 debugChannelOverflow(in vec2 texcoord, in vec4 frame) {
-    return frame;
-  }
-
   c(int) tiles = 5;
   c(int) lastSlot = tiles - 1;
   cRCP(float, tiles);
@@ -22,8 +18,7 @@
     return all( greaterThan(texcoord, vec2(tilesRCP * slot)) && lessThan(texcoord, vec2(tilesRCP * slot + tilesRCP)) );
   }
 
-  #define DebugGbuffers() buffers.tex0.rgb  = debugGbufferOutput(buffers.tex0.rgb, texcoord)
-
+  // GBUFFERS
   vec3 debugGbufferOutput(in vec3 colour, in vec2 texcoord) {
     #ifndef DEBUGGING
       return colour;
@@ -120,5 +115,16 @@
 
       return colour;
     #endif
+  }
+
+  // DEBUGGING
+  #define Debug() buffers.tex0.rgb  = debug(buffers.tex0.rgb, texcoord)
+
+  vec3 debug(in vec3 colour, in vec2 texcoord) {
+    vec3 output = colour;
+
+    output = debugGbufferOutput(colour, texcoord);
+
+    return output;
   }
 #endif
