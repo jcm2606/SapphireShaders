@@ -9,7 +9,7 @@
 #extension GL_EXT_gpu_shader4 : enable
 
 #include "/lib/common/data/ShaderStructure.glsl"
-#define STAGE FINAL
+#define STAGE COMPOSITE4
 #define TYPE FSH
 #define SHADER NONE
 #include "/lib/Syntax.glsl"
@@ -24,16 +24,20 @@ varying vec2 texcoord;
 // UNIFORM
 uniform sampler2D colortex0;
 
+uniform sampler2D depthtex0;
+uniform sampler2D depthtex1;
+uniform sampler2D depthtex2;
+
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"
+#include "/lib/composite/struct/StructPosition.glsl"
 
 NewBufferObject(buffers);
+NewPositionObject(position);
 
 // ARBITRARY
 // INCLUDES
 #include "/lib/common/debugging/DebugFrame.glsl"
-
-#include "/lib/final/Tonemap.glsl"
 
 // MAIN
 void main() {
@@ -43,15 +47,16 @@ void main() {
   // CONVERT FRAME TO HDR
   buffers.tex0.rgb = toFrameHDR(buffers.tex0.rgb);
 
-  // DRAW BLOOM
-  // TODO: Bloom.
+  // DRAW DEPTH OF FIELD
+  // TODO: Depth of field.
 
-  // PERFORM TONEMAPPING
-  buffers.tex0.rgb = tonemap(buffers.tex0.rgb);
+  // PERFORM DEBUGGING
+  Debug();
 
-  // CONVERT FRAME TO GAMMA SPACE
-  buffers.tex0.rgb = toGamma(buffers.tex0.rgb);
+  // CONVERT FRAME TO LDR
+  buffers.tex0.rgb = toFrameLDR(buffers.tex0.rgb);
 
-  // POPULATE FRAMEBUFFER
-  gl_FragColor = buffers.tex0;
+  // POPULATE OUTGOING OBJECTS
+/* DRAWBUFFERS:0 */
+  gl_FragData[0] = buffers.tex0;
 }

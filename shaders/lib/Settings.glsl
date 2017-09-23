@@ -15,10 +15,13 @@
     const int colortex2Format = RGB32F;
     const int colortex3Format = RGB32F;
     const int colortex4Format = RGB32F;
+    const int colortex5Format = RGBA16;
+    const int colortex6Format = RGBA16;
   */
 
   // OPTIFINE OPTIONS
   const int shadowMapResolution = 2048; // [512 1024 2048 4096 8192]
+  cRCP(float, shadowMapResolution);
   const int noiseTextureResolution = 256;
   cRCP(float, noiseTextureResolution);
 
@@ -37,6 +40,7 @@
   #include "/lib/option/Lightmaps.glsl"
   #include "/lib/option/Parallax.glsl"
   #include "/lib/option/Post.glsl"
+  #include "/lib/option/Lighting.glsl"
 
   // OPTIONS
   #define GLOBAL_SPEED 1.0 // [0.03125 0.0625 0.125 0.2 0.25 0.4 0.5 0.6 0.8 1.0 1.2 1.4 1.6 1.8 2.0 4.0 8.0 16.0]

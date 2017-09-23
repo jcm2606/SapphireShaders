@@ -9,7 +9,7 @@
 #extension GL_EXT_gpu_shader4 : enable
 
 #include "/lib/common/data/ShaderStructure.glsl"
-#define STAGE FINAL
+#define STAGE COMPOSITE4
 #define TYPE VSH
 #define SHADER NONE
 #include "/lib/Syntax.glsl"

@@ -32,4 +32,9 @@
   #define smoothMoonPhase ( (float(worldTime) + float(moonPhase) * 24000.0) * 0.00000595238095238 )
 
   #define upVector gbufferModelView[1].xyz
+
+  #define timeNoon timeVector.x
+  #define timeNight timeVector.y
+  #define timeHorizon timeVector.z
+  #define timeMorning timeVector.w
 #endif

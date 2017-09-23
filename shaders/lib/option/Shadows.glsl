@@ -9,4 +9,6 @@
   #define INT_INCLUDED_OPTION_SHADOWS
 
   #define SHADOW_BIAS 0.9
+
+  #define SHADOW_FILTER_QUALITY 2 // [1 2 3 4 5]
 #endif

@@ -41,8 +41,12 @@
 
   /* GENERIC */
   vec3 tonemap(in vec3 colour) {
-    colour = saturation(colour * EXPOSURE, actualSaturation);
+    #ifdef DEBUGGING
+      return colour;
+    #else
+      colour = saturation(colour * EXPOSURE, actualSaturation);
 
-    return Tonemap(colour);
+      return Tonemap(colour);
+    #endif
   }
 #endif

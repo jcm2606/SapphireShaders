@@ -40,7 +40,9 @@ uniform sampler2D texture;
 // INCLUDES
 // MAIN
 void main() {
-  vec4 albedo = texture2D(texture, uvcoord);
+  vec4 albedo = texture2D(texture, uvcoord) * colour;
+
+  albedo.rgb = toShadowLDR(albedo.rgb);
 
   gl_FragData[0] = albedo;
 }
