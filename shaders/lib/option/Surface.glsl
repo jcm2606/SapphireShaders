@@ -16,7 +16,7 @@
 
   #define SURFACE_PROPERTIES_TRANSPARENT vec4(0.11, f0Water, 0.0, 0.0)
   #define SURFACE_PROPERTIES_WATER vec4(0.92, f0Water, 0.0, 0.0)
-  #define SURFACE_PROPERTIES_STAINED_GLASS vec4(0.33, f0Water, 0.0, 0.0)
+  #define SURFACE_PROPERTIES_STAINED_GLASS vec4(0.89, f0Water, 0.0, 0.0)
   #define SURFACE_PROPERTIES_ICE vec4(0.05, f0Water, 0.0, 0.0)
 
   #define SURFACE_PROPERTIES_ENTITIES vec4(0.81, f0Dielectric, 0.0, 0.0)

@@ -13,6 +13,6 @@
   vec3 drawSky(in vec3 colour, in vec3 dir, in int mode) {
     if(getLandMask(position.depthBack) && mode == 0) return colour;
 
-    return getAtmosphere(vec3(0.0), normalize(dir), 0);
+    return getAtmosphere(vec3(0.0), normalize(dir), mode);
   }
 #endif

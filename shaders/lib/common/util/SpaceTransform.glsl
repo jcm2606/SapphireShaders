@@ -19,6 +19,10 @@
     return vpos.xyz;
   }
 
+  vec3 getClipPosition(in vec3 view) {
+    return projMAD3(gbufferProjection, view) / -view.z * 0.5 + 0.5;
+  }
+
   vec3 getWorldPosition(in vec3 view) {
     return transMAD(gbufferModelViewInverse, view);
   }

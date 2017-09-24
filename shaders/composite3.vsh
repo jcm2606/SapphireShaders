@@ -18,7 +18,15 @@
 // VARYING
 varying vec2 texcoord;
 
+flat(vec3) sunVector;
+flat(vec3) moonVector;
+flat(vec3) lightVector;
+
 // UNIFORM
+uniform vec3 sunPosition;
+
+uniform float sunAngle;
+
 // STRUCT
 // ARBITRARY
 // INCLUDES
@@ -27,4 +35,8 @@ void main() {
   gl_Position = ftransform();
 
   texcoord = gl_MultiTexCoord0.xy;
+
+  getSunVector();
+  getMoonVector();
+  getLightVector();
 }

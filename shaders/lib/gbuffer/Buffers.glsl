@@ -48,6 +48,8 @@
     vec4 albedo = textureSample(texture, texcoord) * colour;
   #elif SHADER == GBUFFERS_WATER
     vec4 albedo = textureSample(texture, texcoord) * colour;
+
+    if(comparef(material, MATERIAL_WATER, ubyteMaxRCP)) albedo.rgb = vec3(0.0);
   #elif SHADER == GBUFFERS_SKY_BASIC
     vec4 albedo = colour;
   #elif SHADER == GBUFFERS_BASIC

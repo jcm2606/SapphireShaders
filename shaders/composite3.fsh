@@ -25,6 +25,10 @@
 // VARYING
 varying vec2 texcoord;
 
+flat(vec3) sunVector;
+flat(vec3) moonVector;
+flat(vec3) lightVector;
+
 // UNIFORM
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
@@ -34,6 +38,20 @@ uniform sampler2D colortex4;
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
+
+uniform sampler2D shadowtex0;
+
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+
+uniform int isEyeInWater;
+
+uniform float viewWidth;
+uniform float viewHeight;
+uniform float near;
+uniform float far;
 
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"
@@ -52,18 +70,27 @@ NewMaterialObject(frontMaterial);
 // INCLUDES
 #include "/lib/common/debugging/DebugFrame.glsl"
 
+#include "/lib/composite/Reflections.glsl"
+
 // MAIN
 void main() {
   // POPULATE OBJECTS
   populateBufferObject(buffers, texcoord);
   populateSurfaces(backSurface, frontSurface, buffers, true, true);
   populateMaterials(backMaterial, frontMaterial, backSurface, frontSurface, true, true);
+  populateDepths(position, texcoord);
+  createViewPositions(position, texcoord, true, true);
 
   // CONVERT FRAME TO HDR
   buffers.tex0.rgb = toFrameHDR(buffers.tex0.rgb);
 
+  // CALCULATE ATMOSPHERE LIGHTING COLOURS
+  mat2x3 lighting = mat2x3(0.0);
+
+  #include "/lib/composite/AtmosphereLighting.glsl"
+
   // DRAW REFLECTIONS
-  // TODO: Reflections.
+  buffers.tex0.rgb = drawReflections(buffers.tex0.rgb, lighting[0]);
 
   // DRAW VOLUMETRIC CLOUDS
   // TODO: Volumetric clouds.
