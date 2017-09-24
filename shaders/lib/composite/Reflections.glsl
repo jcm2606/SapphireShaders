@@ -15,7 +15,7 @@
   #include "/lib/common/util/SpecularModel.glsl"
 
   vec3 drawReflections(in vec3 diffuse, in vec3 direct) {
-    if(!getLandMask(position.depthFront)) return diffuse;
+    if(!getLandMask(position.depthFront) || isEyeInWater == 1) return diffuse;
 
     vec3 view = position.viewPositionFront;
     vec3 dir = -fnormalize(view);
@@ -26,10 +26,9 @@
 
     // CREATE REFLECTION VECTORS
     vec3 reflView = reflect(fnormalize(view), normal);
-    vec3 reflDir = reflect(dir, normal);
-
+    
     // RAYTRACE USES CLIPSPACE RAYTRACER
-    vec4 reflection = raytraceClip(-reflDir, view, texcoord, position.depthFront);
+    vec4 reflection = raytraceClip(-reflect(dir, normal), view, texcoord, position.depthFront);
 
     // SAMPLE SKY IN REFLECTED DIRECTION
     vec3 sky = drawSky(diffuse, reflView, 2);
@@ -43,7 +42,7 @@
     reflection.rgb *= ((1.0 - f0) * pow5(1.0 - max0(dot(dir, fnormalize(reflView + dir)))) + f0) * max0(1.0 - pow2(roughness * 1.9));
 
     // APPLY SPECULAR HIGHLIGHT
-    reflection.rgb += direct * ggx(fnormalize(view), normal, lightVector, roughness, metallic, f0);
+    reflection.rgb += direct * buffers.tex0.a * ggx(fnormalize(view), normal, lightVector, roughness, metallic, f0);
 
     // APPLY METALLIC TINTING
     reflection.rgb *= (metallic > 0.5) ? selectSurface().albedo : vec3(1.0);

@@ -35,12 +35,27 @@ flat(float) material;
 // UNIFORM
 uniform sampler2D texture;
 
+uniform float frameTimeCounter;
+
 // STRUCT
 // ARBITRARY
 // INCLUDES
+#include "/lib/common/normal/Normals.glsl"
+
 // MAIN
 void main() {
   vec4 albedo = texture2D(texture, uvcoord) * colour;
+
+  vec3 customNormal = vec3(0.0);
+  if(comparef(material, MATERIAL_WATER, ubyteMaxRCP) || comparef(material, MATERIAL_ICE, ubyteMaxRCP) || comparef(material, MATERIAL_STAINED_GLASS, ubyteMaxRCP)) customNormal = getNormal(world, material);
+
+  if(comparef(material, MATERIAL_WATER, ubyteMaxRCP)) {
+    float oldArea = flength(dFdx(world)) * flength(dFdy(world));
+    vec3 refractPos = refract(fnormalize(world), customNormal, 1.0003 / 1.3333);
+    float newArea = flength(dFdx(refractPos)) * flength(dFdy(refractPos));
+
+    albedo.rgb = vec3(mix(0.0, 1.0, pow(oldArea / newArea, 0.05)));
+  }
 
   albedo.rgb = toShadowLDR(albedo.rgb);
 

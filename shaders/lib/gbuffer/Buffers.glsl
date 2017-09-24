@@ -30,7 +30,7 @@
   #elif SHADER == GBUFFERS_WATER
     c(float) normalMaxAngle = NORMAL_ANGLE_TRANSPARENT;
 
-    surfaceNormal = vec3(0.0, 0.0, 1.0);
+    surfaceNormal = getNormal(world, material);
   #endif
 
   #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WATER

@@ -23,17 +23,20 @@
 
   void getShadows(io Shadows shadowObject) {
     // CALCULATE SHADOW POSITIONS
-    mat2x3 shadowPosition = mat2x3(0.0);
+    mat3 shadowPosition = mat3(0.0);
 
     #define shadowPositionFront shadowPosition[0]
     #define shadowPositionBack shadowPosition[1]
+    #define shadowPositionSolid shadowPosition[2]
 
     shadowPositionFront = getShadowPosition(getWorldPosition(position.viewPositionFront));
     shadowPositionBack = getShadowPosition(getWorldPosition(position.viewPositionBack));
+    shadowPositionSolid = getShadowPosition(getWorldPosition(position.viewPositionBack));
     
     c(float) shadowBias = 0.0001;
-    shadowPositionFront.z += shadowBias;
-    shadowPositionBack.z += shadowBias;
+    shadowPositionFront.z -= shadowBias;
+    shadowPositionBack.z -= shadowBias;
+    shadowPositionSolid.z -= shadowBias;
 
     // FIND BLOCKERS
     float rotAngle = dither64(ivec2(int(texcoord.x * viewWidth), int(texcoord.y * viewHeight))) * tau;
@@ -50,7 +53,7 @@
       for(int j = -1; j <= 1; j++) {
         vec2 offset = (vec2(i, j) + 0.5) * rotation * blockerSearchWidth;
 
-        blockerFront += texture2DLod(shadowtex0, distortShadowPosition(offset + shadowPositionFront.xy, 1), blockerSearchLOD).x;
+        blockerFront += texture2DLod(shadowtex0, distortShadowPosition(offset + shadowPositionSolid.xy, 1), blockerSearchLOD).x;
         blockerBack += texture2DLod(shadowtex1, distortShadowPosition(offset + shadowPositionBack.xy, 1), blockerSearchLOD).x;
       }
     }
@@ -66,7 +69,7 @@
 
     c(float) minWidth = 0.0;
     //vec2 width = max(vec2(minWidth), vec2(shadowPositionFront.z, shadowPositionBack.z) - blocker * lightDistance) * shadowQualityRCP;
-    vec2 width = max(vec2(minWidth), (vec2(shadowPositionFront.z, shadowPositionBack.z) - blocker) * lightDistanceRCP) * shadowQualityRCP;
+    vec2 width = max(vec2(minWidth), (vec2(shadowPositionSolid.z, shadowPositionBack.z) - blocker) * lightDistanceRCP) * shadowQualityRCP;
 
     mat2 widths = mat2(
       vec2(width.x) * rotation,

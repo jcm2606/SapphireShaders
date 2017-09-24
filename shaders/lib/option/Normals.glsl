@@ -12,4 +12,9 @@
   #define NORMAL_ANGLE_SOLID 0.5 // [0.1 0.2 0.3 0.4 0.5 0.6 0.7 0.8 0.9 1.0]
   #define NORMAL_ANGLE_WET 1.0
   #define NORMAL_ANGLE_TRANSPARENT 0.03
+
+  // CUSTOM NORMALS
+  #define WaterHeight water0 // [water0]
+  #define IceHeight ice0 // [water0]
+  #define GlassHeight glass0 // [water0]
 #endif

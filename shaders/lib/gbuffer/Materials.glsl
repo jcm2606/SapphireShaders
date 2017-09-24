@@ -70,7 +70,8 @@
     ) ?
       MATERIAL_METAL :
       material;
-  #elif SHADER == GBUFFERS_WATER || STAGE == SHADOW
+  #endif
+  #if SHADER == GBUFFERS_WATER || STAGE == SHADOW
     // TRANSPARENT
     material = MATERIAL_TRANSPARENT;
     

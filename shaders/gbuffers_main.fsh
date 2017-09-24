@@ -38,6 +38,10 @@ varying float dist;
     uniform sampler2D specular;
   #endif
 
+  #if SHADER == GBUFFERS_WATER
+    uniform float frameTimeCounter;
+  #endif
+
   uniform mat4 gbufferProjection;
   uniform mat4 gbufferProjectionInverse;
   uniform mat4 gbufferModelViewInverse;
@@ -57,6 +61,8 @@ varying float dist;
 #include "/lib/gbuffer/Parallax.glsl"
 #include "/lib/gbuffer/DirectionalLightmap.glsl"
 
+#include "/lib/common/normal/Normals.glsl"
+
 // MAIN
 void main() {
   vec2 texcoord = uvcoord;
@@ -72,7 +78,7 @@ void main() {
     ttn[0].z, ttn[1].z, ttn[2].z
   );
 
-  vec3 view = normalize(tbn * vertex);
+  vec3 view = fnormalize(tbn * vertex);
 
   #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
     texcoord = getParallax(view);

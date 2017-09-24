@@ -76,7 +76,7 @@ void main() {
 
   normal = fnormalize(gl_NormalMatrix * gl_Normal);
 
-  ttn[0] = normalize(gl_NormalMatrix * at_tangent.xyz);
+  ttn[0] = fnormalize(gl_NormalMatrix * at_tangent.xyz);
   ttn[1] = cross(ttn[0], normal);
   ttn[2] = normal;
 }

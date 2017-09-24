@@ -100,13 +100,14 @@ void main() {
   #include "/lib/composite/AtmosphereLighting.glsl"
 
   // PERFORM SHADING ON FRAME
-  buffers.tex0.rgb = getShadedFragment(buffers.tex0.rgb, lighting);
+  float frontOcclusion = 0.0;
+  buffers.tex0.rgb = getShadedFragment(frontOcclusion, buffers.tex0.rgb, lighting);
 
   // SAMPLE VOLUMETRIC FOG
   // TODO: Volumetric fog.
 
   // SEND FRONT SHADOW DOWN FOR SPECULAR HIGHLIGHT
-  // TODO: Reflections.
+  buffers.tex0.a = frontOcclusion;
 
   // PERFORM DEBUGGING
   Debug();

@@ -55,9 +55,13 @@
   float flength(in vec3 n) { return sqrt(flengthsqr(n)); }
   float flength(in vec4 n) { return sqrt(flengthsqr(n)); }
 
+  float flengthinv(in vec2 n) { return inversesqrt(flengthsqr(n)); }
   float flengthinv(in vec3 n) { return inversesqrt(flengthsqr(n)); }
+  float flengthinv(in vec4 n) { return inversesqrt(flengthsqr(n)); }
 
+  vec2 fnormalize(in vec2 n) { return n * flengthinv(n); }
   vec3 fnormalize(in vec3 n) { return n * flengthinv(n); }
+  vec4 fnormalize(in vec4 n) { return n * flengthinv(n); }
 
   bool comparef(in float a, in float b, const in float width) { return abs(a - b) < width; }
 

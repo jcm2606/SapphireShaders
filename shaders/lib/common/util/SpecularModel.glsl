@@ -9,7 +9,7 @@
   #define INT_INCLUDED_UTIL_SPECULARMODEL
 
   vec3 halfVector(in vec3 a, in vec3 b) {
-    return normalize(a - b);
+    return fnormalize(a - b);
   }
 
   float fresnelSchlick(in float angle, in float f0) {

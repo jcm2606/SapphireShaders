@@ -14,33 +14,34 @@
   #define onScreen() (floor(pos.xy) == vec2(0.0))
 
   vec4 raytraceClip(in vec3 dir, in vec3 view, in vec2 texcoord, in float depth) {
-    c(float) quality = 16.0;
+    c(int) quality = 16;
+    cRCP(float, quality);
+    c(int) steps = quality + 4;
 
     vec3 clip = vec3(texcoord, depth);
 
-    vec3 direction = normalize(getClipPosition(view + dir) - clip);
-
-    direction.xy = normalize(direction.xy);
+    vec3 direction = fnormalize(getClipPosition(view + dir) - clip);
+    direction.xy = fnormalize(direction.xy);
     
     vec3 maxLengths = (step(0.0, direction) - clip) / direction;
 
-    float mult = min(min(maxLengths.x, maxLengths.y), maxLengths.z);
-    float maxStepLength = mult / quality;
+    float maxStepLength = min(min(maxLengths.x, maxLengths.y), maxLengths.z) * qualityRCP;
     float minStepLength = maxStepLength * 0.1;
 
     float stepLength = maxStepLength * (0.0 * 0.9 + 0.1);
+    float stepWeight = 1.0 / abs(direction.z);
     vec3 pos = direction * stepLength + clip;
 
     float currDepth = texture2D(depthtex1, pos.xy).x;
 
     bool rayHit = false;
 
-    for(int i = 0; i < int(quality) + 4; i++) {
+    for(int i = 0; i < steps; i++) {
       rayHit = currDepth < pos.z;
 
       if(rayHit || !onScreen()) break;
 
-      stepLength = (currDepth - pos.z) / abs(direction.z);
+      stepLength = (currDepth - pos.z) * stepWeight;
       stepLength = clamp(stepLength, minStepLength, maxStepLength);
 
       pos = direction * stepLength + pos;
@@ -49,7 +50,7 @@
     }
 
     if(faceVisible()) {
-      stepLength = (currDepth - pos.z) / abs(direction.z);
+      stepLength = (currDepth - pos.z) * stepWeight;
       pos = direction * stepLength + pos;
       currDepth = texture2D(depthtex1, pos.xy).x;
     }
