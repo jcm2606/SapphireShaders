@@ -16,23 +16,23 @@
 
     // FOLIAGE
     material = (
-      compareID(SAPLING) ||
-      compareID(LEAVES1) ||
-      compareID(LEAVES2) ||
-      compareID(TALLGRASS) ||
-      compareID(DEADBUSH) ||
-      compareID(FLOWER_YELLOW) ||
-      compareID(FLOWER_RED) ||
-      compareID(MUSHROOM_BROWN) ||
-      compareID(MUSHROOM_RED) ||
-      compareID(WHEAT) ||
-      compareID(REEDS) ||
-      compareID(VINE) ||
-      compareID(LILYPAD) ||
-      compareID(NETHERWART) ||
-      compareID(CARROTS) ||
-      compareID(POTATOES) ||
-      compareID(DOUBLE_PLANT) ||
+      entity.x == SAPLING.x ||
+      entity.x == LEAVES1.x ||
+      entity.x == LEAVES2.x ||
+      entity.x == TALLGRASS.x ||
+      entity.x == DEADBUSH.x ||
+      entity.x == FLOWER_YELLOW.x ||
+      entity.x == FLOWER_RED.x ||
+      entity.x == MUSHROOM_BROWN.x ||
+      entity.x == MUSHROOM_RED.x ||
+      entity.x == WHEAT.x ||
+      entity.x == REEDS.x ||
+      entity.x == VINE.x ||
+      entity.x == LILYPAD.x ||
+      entity.x == NETHERWART.x ||
+      entity.x == CARROTS.x ||
+      entity.x == POTATOES.x ||
+      entity.x == DOUBLE_PLANT.x ||
       (
         // Place any extra IDs you want to check for in here, replacing 'false'.
         false
@@ -43,14 +43,14 @@
 
     // EMISSIVE
     material = (
-      compareID(TORCH) ||
-      compareID(FIRE) ||
-      compareID(GLOWSTONE) ||
-      compareID(REDSTONE_LAMP_LIT) ||
-      compareID(REDSTONE_LAMP_UNLIT) ||
-      compareID(BEACON) ||
-      compareID(SEA_LANTERN) ||
-      compareID(END_ROD) ||
+      entity.x == TORCH.x ||
+      entity.x == FIRE.x ||
+      entity.x == GLOWSTONE.x ||
+      entity.x == REDSTONE_LAMP_LIT.x ||
+      entity.x == REDSTONE_LAMP_UNLIT.x ||
+      entity.x == BEACON.x ||
+      entity.x == SEA_LANTERN.x ||
+      entity.x == END_ROD.x ||
       (
         // Place any extra IDs you want to check for in here, replacing 'false'.
         false
@@ -61,8 +61,8 @@
 
     // METALS
     material = (
-      compareID(BLOCK_IRON) ||
-      compareID(BLOCK_GOLD) ||
+      entity.x == BLOCK_IRON.x ||
+      entity.x == BLOCK_GOLD.x ||
       (
         // Place any extra IDs you want to check for in here, replacing 'false'.
         false
@@ -89,7 +89,7 @@
 
     // ICE
     material = (
-      compareID(ICE) ||
+      entity.x == ICE.x ||
       (
         // Place any extra IDs you want to check for in here, replacing 'false'.
         false
