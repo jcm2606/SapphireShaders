@@ -12,7 +12,7 @@
   #define c(type) const type
   #define flat(type) flat varying type
 
-  #define cRCP(type, name) const ##type name##RCP = 1.0 / ##name
+  #define cRCP(type, name) const type name##RCP = 1.0 / name
 
   #define clamp01(n) clamp(n, 0.0, 1.0)
   #define max0(n) max(n, 0.0)

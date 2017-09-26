@@ -35,7 +35,7 @@
 
       height *= 0.2;
 
-      return 1.0 - pow(-(height * 2.0 - 1.0), 4.0) * 3.0;
+      return 1.0 - pow(-(height * 2.0 - 1.0), 5.0) * 3.0;
     }
 
     float water1(in vec3 world) {
