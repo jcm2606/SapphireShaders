@@ -72,7 +72,7 @@ void main() {
   // FEATURE: Waving terrain.
 
   #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_WATER
-    gl_Position = reprojectVertex(gbufferModelView, position.xyz);
+    gl_Position = reprojectVertex(gbufferModelView, position);
   #else
     gl_Position = reprojectVertex(gl_ModelViewMatrix, gl_Vertex.xyz);
   #endif

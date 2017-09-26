@@ -60,7 +60,7 @@ void main() {
   lmcoord = (gl_TextureMatrix[1] * gl_MultiTexCoord1).xy;
 
   vec3 position = deprojectVertex(shadowModelViewInverse, gl_ModelViewMatrix, gl_Vertex.xyz);
-  world = position.xyz + cameraPosition;
+  world = position + cameraPosition;
 
   entity = mc_Entity.xz;
 
