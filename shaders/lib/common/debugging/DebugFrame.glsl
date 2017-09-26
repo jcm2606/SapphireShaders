@@ -15,7 +15,7 @@
   bool isInSlot(in vec2 texcoord, in ivec2 slot) {
     slot = min(slot, lastSlot);
 
-    return all( greaterThan(texcoord, vec2(tilesRCP * slot)) && lessThan(texcoord, vec2(tilesRCP * slot + tilesRCP)) );
+    return all(greaterThan(texcoord, vec2(tilesRCP * slot))) && all(lessThan(texcoord, vec2(tilesRCP * slot + tilesRCP)) );
   }
 
   // GBUFFERS
@@ -140,10 +140,10 @@
   #define Debug() buffers.tex0.rgb  = debug(buffers.tex0.rgb, texcoord)
 
   vec3 debug(in vec3 colour, in vec2 texcoord) {
-    vec3 output = colour;
+    vec3 debugout = colour;
 
-    output = debugGbufferOutput(colour, texcoord);
+    debugout = debugGbufferOutput(colour, texcoord);
 
-    return output;
+    return debugout;
   }
 #endif
