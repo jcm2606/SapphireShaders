@@ -39,6 +39,8 @@ varying float dist;
   #endif
 
   #if SHADER == GBUFFERS_WATER
+    uniform sampler2D noisetex;
+
     uniform float frameTimeCounter;
   #endif
 
@@ -58,10 +60,10 @@ varying float dist;
 
 #include "/lib/common/util/Encoding.glsl"
 
+#include "/lib/common/normal/Normals.glsl"
+
 #include "/lib/gbuffer/Parallax.glsl"
 #include "/lib/gbuffer/DirectionalLightmap.glsl"
-
-#include "/lib/common/normal/Normals.glsl"
 
 // MAIN
 void main() {

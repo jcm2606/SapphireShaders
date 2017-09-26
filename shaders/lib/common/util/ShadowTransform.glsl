@@ -10,10 +10,10 @@
 
   #include "/lib/common/util/SpaceTransform.glsl"
 
-  mat4 shadowMVP = shadowProjection * shadowModelView * 0.5;
+  mat4 shadowMVP = shadowProjection * shadowModelView;
 
   vec3 getShadowPosition(in vec3 world) {
-    return transMAD(shadowMVP, world) + 0.5;
+    return transMAD(shadowMVP, world) * 0.5 + 0.5;
   }
 
   c(float) shadowBias = SHADOW_BIAS;

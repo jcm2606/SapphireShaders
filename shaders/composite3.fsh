@@ -29,6 +29,8 @@ flat(vec3) sunVector;
 flat(vec3) moonVector;
 flat(vec3) lightVector;
 
+flat(mat2x3) lighting;
+
 // UNIFORM
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
@@ -83,11 +85,6 @@ void main() {
 
   // CONVERT FRAME TO HDR
   buffers.tex0.rgb = toFrameHDR(buffers.tex0.rgb);
-
-  // CALCULATE ATMOSPHERE LIGHTING COLOURS
-  mat2x3 lighting = mat2x3(0.0);
-
-  #include "/lib/composite/AtmosphereLighting.glsl"
 
   // DRAW REFLECTIONS
   buffers.tex0.rgb = drawReflections(buffers.tex0.rgb, lighting[0]);

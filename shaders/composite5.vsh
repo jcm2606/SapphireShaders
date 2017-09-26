@@ -24,7 +24,7 @@ varying vec2 texcoord;
 // INCLUDES
 // MAIN
 void main() {
-  gl_Position = ftransform();
+  gl_Position = reprojectVertex(gl_ModelViewMatrix, gl_Vertex.xyz);
 
   texcoord = gl_MultiTexCoord0.xy;
 }

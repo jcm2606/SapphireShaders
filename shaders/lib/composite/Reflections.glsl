@@ -14,6 +14,17 @@
 
   #include "/lib/common/util/SpecularModel.glsl"
 
+  vec3 sunMRP(in vec3 normal, in vec3 view, in vec3 light) {
+    vec3 reflected = reflect(view, normal);
+
+    c(float) radius = 0.02;
+    float d = cos(radius);
+
+    float LdotR = dot(light, reflected);
+
+    return (LdotR < d) ? fnormalize(d * light + (fnormalize(reflected - LdotR * light) * sin(radius))) : reflected;
+  }
+
   vec3 drawReflections(in vec3 diffuse, in vec3 direct) {
     if(!getLandMask(position.depthFront) || isEyeInWater == 1) return diffuse;
 
@@ -21,6 +32,7 @@
     vec3 dir = -fnormalize(view);
     vec3 normal = fnormalize(selectSurface().normal);
     float roughness = selectSurface().roughness;
+    vec2 alpha = pow2(vec2(roughness * 1.45, roughness * 1.2));
     float f0 = selectSurface().f0;
     float metallic = (f0 > 0.5) ? 1.0 : 0.0;
 
@@ -28,7 +40,7 @@
     vec3 reflView = reflect(fnormalize(view), normal);
     
     // RAYTRACE USES CLIPSPACE RAYTRACER
-    vec4 reflection = raytraceClip(-reflect(dir, normal), view, texcoord, position.depthFront);
+    vec4 specular = raytraceClip(-reflect(dir, normal), view, texcoord, position.depthFront);
 
     // SAMPLE SKY IN REFLECTED DIRECTION
     vec3 sky = drawSky(diffuse, reflView, 2);
@@ -36,17 +48,30 @@
     // TODO: Volumetric clouds.
 
     // BLEND BETWEEN RAYTRACED AND SKY SAMPLES
-    reflection.rgb = mix(sky, reflection.rgb, reflection.a);
+    specular.rgb = mix(sky, specular.rgb, specular.a);
 
     // APPLY FRESNEL
-    reflection.rgb *= ((1.0 - f0) * pow5(1.0 - max0(dot(dir, fnormalize(reflView + dir)))) + f0) * max0(1.0 - pow2(roughness * 1.9));
+    float fresnel = ((1.0 - f0) * pow5(1.0 - max0(dot(dir, fnormalize(reflView + dir)))) + f0) * max0(1.0 - alpha.x);
+    #if REFLECTIONS_BLENDING == 0
+      specular.rgb *= fresnel;
+    #else
+      specular.rgb = mix(diffuse, specular.rgb, fresnel);
+    #endif
 
     // APPLY SPECULAR HIGHLIGHT
-    reflection.rgb += direct * buffers.tex0.a * ggx(fnormalize(view), normal, lightVector, roughness, metallic, f0);
+    //reflection.rgb += ggx(fnormalize(view), normal, lightVector, roughness, metallic, f0);
+    vec3 light = sunMRP(normal, fnormalize(view), lightVector);
+    float highlight = ggx(fnormalize(view), fnormalize(normal), light, alpha.y, f0);
+
+    specular.rgb += direct * ((!getLandMask(position.depthBack)) ? 1.0 : buffers.tex0.a) * highlight;
 
     // APPLY METALLIC TINTING
-    reflection.rgb *= (metallic > 0.5) ? selectSurface().albedo : vec3(1.0);
+    specular.rgb *= (metallic > 0.5) ? selectSurface().albedo : vec3(1.0);
 
-    return diffuse * (1.0 - metallic) + reflection.rgb;
+    #if REFLECTIONS_BLENDING == 0
+      return diffuse * (1.0 - metallic) + specular.rgb;
+    #else
+      return specular.rgb;
+    #endif
   }
 #endif

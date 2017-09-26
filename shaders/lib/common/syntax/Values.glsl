@@ -28,4 +28,10 @@
 
   c(float) ulongMax = exp2(64);
   cRCP(float, ulongMax);
+
+  c(float) iorAir = 1.0003;
+  c(float) iorWater = 1.333;
+
+  c(float) refractInterfaceAirWater = iorAir / iorWater;
+  c(float) refractInterfaceWaterAir = iorWater / iorAir;
 #endif

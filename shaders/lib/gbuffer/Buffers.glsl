@@ -30,7 +30,12 @@
   #elif SHADER == GBUFFERS_WATER
     c(float) normalMaxAngle = NORMAL_ANGLE_TRANSPARENT;
 
-    surfaceNormal = getNormal(world, material);
+    vec3 pos = world;
+    #ifdef PARALLAX_TRANSPARENT
+      pos = getParallax(pos, view, material);
+    #endif
+
+    surfaceNormal = getNormal(pos, material);
   #endif
 
   #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WATER
@@ -57,12 +62,7 @@
   #endif
 
   // SURFACE PROPERTIES
-  vec4 surfaceProperties = vec4(
-    0.0, // Smoothness. Inverted with `1.0 - smoothness` to get roughness.
-    0.02, // f0
-    0.0, // emission
-    0.0 // porosity/placeholder
-  );
+  vec4 surfaceProperties = SURFACE_PROPERTIES_DEFAULT;
 
   #define smoothness surfaceProperties.x
   #define f0 surfaceProperties.y
@@ -74,22 +74,22 @@
 
     #if   RESOURCE_FORMAT == 0
       // Specular pack. Uses a hardcoded metalness mask to determine f0, also uses a hardcoded emissive mask to determine emission.
-      smoothness = specularMap.x;
+      smoothness = (specularMap.x > 0.0) ? specularMap.x : smoothness;
       f0 = (comparef(material, MATERIAL_METAL, ubyteMaxRCP)) ? f0Metal : f0Dielectric;
       emission = (comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) ? 1.0 : 0.0;
     #elif RESOURCE_FORMAT == 1
       // Old PBR pack. Uses metalness mask from texture to determine f0. Uses a hardcoded emissive mask to determine emission.
-      smoothness = specularMap.x;
+      smoothness = (specularMap.x > 0.0) ? specularMap.x : smoothness;
       f0 = mix(f0Dielectric, f0Metal, specularMap.y);
       emission = (comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) ? 1.0 : 0.0;
     #elif RESOURCE_FORMAT == 2
       // Old PBR pack, w/ emissive support. Uses metalness mask and emissive mask from texture.
-      smoothness = specularMap.x;
+      smoothness = (specularMap.x > 0.0) ? specularMap.x : smoothness;
       f0 = mix(f0Dielectric, f0Metal, specularMap.y);
       emission = specularMap.z;
     #elif RESOURCE_FORMAT == 3
       // New PBR pack. Everything comes from texture.
-      smoothness = specularMap.z;
+      smoothness = (specularMap.z > 0.0) ? specularMap.z : smoothness;
       f0 = specularMap.x;
       emission = (comparef(material, MATERIAL_EMISSIVE, ubyteMaxRCP)) ? specularMap.w : 0.0;
     #endif
@@ -105,7 +105,9 @@
     surfaceProperties = SURFACE_PROPERTIES_ENTITIES;
   #endif
 
-  smoothness = 1.0 - smoothness;
+  c(float) roughnessMax = 0.9999999;
+  c(float) roughnessMin = 1.0 - roughnessMax;
+  smoothness = clamp(1.0 - smoothness, roughnessMin, roughnessMax);
 
   surface0Buffer = encode2x8(surfaceProperties.xy);
   surface1Buffer = encode2x8(surfaceProperties.zw);

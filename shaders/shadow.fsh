@@ -35,6 +35,8 @@ flat(float) material;
 // UNIFORM
 uniform sampler2D texture;
 
+uniform sampler2D noisetex;
+
 uniform float frameTimeCounter;
 
 // STRUCT
@@ -51,10 +53,10 @@ void main() {
 
   if(comparef(material, MATERIAL_WATER, ubyteMaxRCP)) {
     float oldArea = flength(dFdx(world)) * flength(dFdy(world));
-    vec3 refractPos = refract(fnormalize(world), customNormal, 1.0003 / 1.3333);
+    vec3 refractPos = refract(fnormalize(world), customNormal, refractInterfaceAirWater);
     float newArea = flength(dFdx(refractPos)) * flength(dFdy(refractPos));
 
-    albedo.rgb = vec3(mix(0.0, 1.0, pow(oldArea / newArea, 0.05)));
+    albedo.rgb = toGamma(vec3((pow(oldArea / newArea, 0.1))));
   }
 
   albedo.rgb = toShadowLDR(albedo.rgb);

@@ -24,21 +24,29 @@ flat(vec3) lightVector;
 
 flat(vec4) timeVector;
 
+flat(mat2x3) lighting;
+
 // UNIFORM
 uniform vec3 sunPosition;
 
 uniform float sunAngle;
 
+uniform mat4 gbufferModelView;
+
 // STRUCT
 // ARBITRARY
 // INCLUDES
+#include "/lib/composite/Sky.glsl"
+
 // MAIN
 void main() {
-  gl_Position = ftransform();
+  gl_Position = reprojectVertex(gl_ModelViewMatrix, gl_Vertex.xyz);
 
   texcoord = gl_MultiTexCoord0.xy;
 
   getSunVector();
   getMoonVector();
   getLightVector();
+
+  #include "/lib/composite/AtmosphereLighting.glsl"
 }

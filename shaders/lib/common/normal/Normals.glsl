@@ -19,23 +19,68 @@
 
       vec2 position = world.xz - world.y;
 
-      position *= 0.35;
-      position *= rot2(windDirection);
+      c(float) waveSpeed = 0.0017;
+      c(vec2) waveDirection = swizzle2 * waveSpeed;
+      vec2 move = waveDirection * frametime;
 
-      vec2 move = swizzle2 * frametime * 0.15;
-      c(vec2) stretch = vec2(1.0, 0.75);
+      c(mat2) rot = rot2(windDirection);
 
-      height += simplex2D(position * vec2(1.0, 0.55) + move * 1.0) * 1.0;
-      height += simplex2D(position * vec2(1.0, 0.65) * 1.5 + move * 4.0) * 0.5;
-      height += simplex2D(position * vec2(1.0, 0.75) * 2.0 + move * 8.0) * 0.25;
+      position *= 0.0011;
 
-      position *= rot2(windDirection);
-      height += simplex2D(position * 4.0 + move * 4.0) * 0.125;
+      position *= rot; height += texnoise2D(noisetex, position + move);
+      position *= rot; height -= texnoise2D(noisetex, position * 2.0 + move * 2.0) * 0.5;
+      position *= rot; height += texnoise2D(noisetex, position * 4.0 + move * 4.0) * 0.25;
+      position *= rot; height += texnoise2D(noisetex, position * 8.0 + move * 8.0) * 0.125;
+      position *= rot; height += texnoise2D(noisetex, position * 16.0 + move * 16.0) * 0.0625;
 
-      return height;
+      height *= 0.2;
+
+      return 1.0 - pow(-(height * 2.0 - 1.0), 3.0) * 3.0;
     }
 
-    float getWaterHeight(in vec3 world) {
+    float water1(in vec3 world) {
+      float height = 0.0;
+
+      vec2 position = world.xz - world.y;
+
+      c(float) waveSpeed = 0.0017;
+      c(vec2) waveDirection = swizzle2 * waveSpeed;
+      vec2 move = waveDirection * frametime;
+
+      c(mat2) rot = rot2(windDirection);
+
+      position *= 0.0007;
+
+      //position *= rot; height += texnoise2D(noisetex, position * 0.5 + move) * 0.25;
+
+      //position *= rot; height -= texnoise2D(noisetex, position * 0.75 + move) * 0.5;
+
+      position *= rot; height += texnoise2D(noisetex, position + move) * 0.5;
+
+      position *= rot; height += texnoise2D(noisetex, position * 2.0 + (move * 2.0)) * 0.5;
+
+      position *= rot; height += texnoise2D(noisetex, position * 4.0 + (move * 4.0)) * 0.25;
+
+      position *= rot; height -= texnoise2D(noisetex, position * 8.0 + (move * 8.0)) * 0.125;
+
+      position *= rot; height += texnoise2D(noisetex, position * 16.0 + (move * 16.0)) * 0.0625;
+
+      //position *= rot; height += texnoise2D(noisetex, position * 32.0 + (move * 32.0)) * 0.03125;
+      
+      //position *= rot; height += texnoise2D(noisetex, position * 64.0 + (move * 64.0)) * 0.015625;
+
+      //position *= rot; height += texnoise2D(noisetex, position * 128.0 + (move * 128.0)) * 0.0078125;
+
+      //position *= rot; height += texnoise2D(noisetex, position * 256.0 + (move * 256.0)) * 0.00390625;
+
+      //position *= rot; height += texnoise2D(noisetex, position * 512.0 + (move * 512.0)) * 0.001953125;
+
+      //position *= rot; height += texnoise2D(noisetex, position * 1024.0 + (move * 1024.0)) * 0.0009765625;
+
+      return (pow(abs(height * 2.0 - 1.0), 0.75)) * 1.5;
+    }
+
+     float getWaterHeight(in vec3 world) {
       return WaterHeight(world);
     }
 

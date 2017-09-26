@@ -38,9 +38,7 @@
       #ifndef PARALLAX_TERRAIN
         return texcoord;
       #endif
-
-      float dist = flength(view);
-
+      
       if(dist < maxOcclusionDistance) {
         vec3 interval = view * intervalMult;
         vec3 coord = vec3(uvcoord, 1.0);
@@ -60,6 +58,27 @@
       return texcoord;
     }
   #elif SHADER == GBUFFERS_WATER
+    vec3 getParallax(in vec3 world, in vec3 view, in float material) {
+      c(float) steps = PARALLAX_TRANSPARENT_STEPS;
+      cRCP(float, steps);
 
+      float height = (
+        (comparef(material, MATERIAL_WATER, ubyteMaxRCP)) ? PARALLAX_TRANSPARENT_HEIGHT_WATER : (
+          (comparef(material, MATERIAL_ICE, ubyteMaxRCP)) ? PARALLAX_TRANSPARENT_HEIGHT_ICE : (
+            (comparef(material, MATERIAL_STAINED_GLASS, ubyteMaxRCP)) ? PARALLAX_TRANSPARENT_HEIGHT_GLASS : 0.0
+          )
+        )
+      );
+
+      float waveHeight = getHeight(world, material) * height * stepsRCP;
+
+      for(int i = 0; i < steps; i++) {
+        world.xz = waveHeight * view.xy + world.xz;
+
+        waveHeight = getHeight(world, material) * height * stepsRCP;
+      }
+
+      return world;
+    }
   #endif
 #endif

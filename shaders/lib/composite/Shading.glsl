@@ -25,14 +25,10 @@
 
     frontOcclusion = shadowObject.occlusion.z;
 
-    #define direct ((lighting[0] * shadowObject.occlusion.x) * directShading) * directTint
-    #define ambient ((lighting[1] * 0.5) * backSurface.skyLight) * ambientShading
-    #define block lightingBlock * backSurface.blockLight
+    vec3 direct = lighting[0] * shadowObject.occlusion.x * directShading * directTint;
+    vec3 ambient = lighting[1] * backSurface.skyLight * ambientShading;
+    vec3 block = mix(lightingBlock * backSurface.blockLight, lightingBlock * 8.0, backSurface.emission);
 
-    return albedo * (direct + (ambient + (block)));
-
-    #undef direct
-    #undef ambient
-    #undef block
+    return albedo * (direct + ambient + block);
   }
 #endif

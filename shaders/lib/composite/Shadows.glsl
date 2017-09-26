@@ -43,15 +43,17 @@
     mat2 rotation = rot2(rotAngle);
 
     vec2 blocker = vec2(0.0);
-    float blockerSearchWidth = 0.001;
+    c(float) blockerSearchWidth = 0.001;
     c(int) blockerSearchLOD = 0;
 
     #define blockerFront blocker.x
     #define blockerBack blocker.y
 
+    vec2 offset = vec2(0.0);
+
     for(int i = -1; i <= 1; i++) {
       for(int j = -1; j <= 1; j++) {
-        vec2 offset = (vec2(i, j) + 0.5) * rotation * blockerSearchWidth;
+        offset = (vec2(i, j) + 0.5) * rotation * blockerSearchWidth;
 
         blockerFront += texture2DLod(shadowtex0, distortShadowPosition(offset + shadowPositionSolid.xy, 1), blockerSearchLOD).x;
         blockerBack += texture2DLod(shadowtex1, distortShadowPosition(offset + shadowPositionBack.xy, 1), blockerSearchLOD).x;
@@ -67,7 +69,7 @@
     c(int) shadowQuality = SHADOW_FILTER_QUALITY;
     cRCP(float, shadowQuality);
 
-    c(float) minWidth = 0.0;
+    c(float) minWidth = 0.00001;
     //vec2 width = max(vec2(minWidth), vec2(shadowPositionFront.z, shadowPositionBack.z) - blocker * lightDistance) * shadowQualityRCP;
     vec2 width = max(vec2(minWidth), (vec2(shadowPositionSolid.z, shadowPositionBack.z) - blocker) * lightDistanceRCP) * shadowQualityRCP;
 
@@ -81,9 +83,12 @@
 
     c(float) weight = 1.0 / pow(float(shadowQuality) * 2.0 + 1.0, 2.0);
 
+    mat2 offsets = mat2(0.0);
+    vec3 depths = vec3(0.0);
+
     for(int i = -shadowQuality; i <= shadowQuality; i++) {
       for(int j = -shadowQuality; j <= shadowQuality; j++) {
-        mat2 offsets = mat2(
+        offsets = mat2(
           vec2(i, j) * widthFront,
           vec2(i, j) * widthBack
         );
@@ -91,7 +96,7 @@
         #define offsetFront offsets[0]
         #define offsetBack offsets[1]
 
-        vec3 depths = vec3(
+        depths = vec3(
           texture2D(shadowtex1, distortShadowPosition(offsetBack + shadowPositionBack.xy, 1)).x,
           texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).x,
           texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionFront.xy, 1)).x

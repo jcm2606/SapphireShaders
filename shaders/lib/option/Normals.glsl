@@ -14,7 +14,7 @@
   #define NORMAL_ANGLE_TRANSPARENT 0.03
 
   // CUSTOM NORMALS
-  #define WaterHeight water0 // [water0]
-  #define IceHeight ice0 // [water0]
-  #define GlassHeight glass0 // [water0]
+  #define WaterHeight water0 // [water0 water1]
+  #define IceHeight ice0 // [ice0]
+  #define GlassHeight glass0 // [glass0]
 #endif

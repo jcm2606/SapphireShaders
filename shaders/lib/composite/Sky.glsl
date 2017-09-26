@@ -11,7 +11,9 @@
   #include "/lib/composite/Atmosphere.glsl"
 
   vec3 drawSky(in vec3 colour, in vec3 dir, in int mode) {
-    if(getLandMask(position.depthBack) && mode == 0) return colour;
+    #if TYPE == FSH
+     if(getLandMask(position.depthBack) && mode == 0) return colour;
+    #endif
 
     return getAtmosphere(vec3(0.0), fnormalize(dir), mode);
   }

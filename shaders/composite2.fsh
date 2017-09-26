@@ -25,6 +25,12 @@
 // VARYING
 varying vec2 texcoord;
 
+flat(vec3) sunVector;
+flat(vec3) moonVector;
+flat(vec3) lightVector;
+
+flat(mat2x3) lighting;
+
 // UNIFORM
 uniform sampler2D colortex0;
 uniform sampler2D colortex1;
@@ -34,6 +40,21 @@ uniform sampler2D colortex4;
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
+
+uniform sampler2D noisetex;
+
+uniform mat4 gbufferProjection;
+uniform mat4 gbufferProjectionInverse;
+uniform mat4 gbufferModelView;
+uniform mat4 gbufferModelViewInverse;
+
+uniform int isEyeInWater;
+
+uniform float near;
+uniform float far;
+uniform float frameTimeCounter;
+
+uniform vec3 cameraPosition;
 
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"
@@ -52,27 +73,35 @@ NewMaterialObject(frontMaterial);
 // INCLUDES
 #include "/lib/common/debugging/DebugFrame.glsl"
 
+#include "/lib/composite/DepthFog.glsl"
+
+#include "/lib/composite/Sky.glsl"
+
+#include "/lib/composite/Refraction.glsl"
+
 // MAIN
 void main() {
   // POPULATE OBJECTS
   populateBufferObject(buffers, texcoord);
   populateSurfaces(backSurface, frontSurface, buffers, true, true);
   populateMaterials(backMaterial, frontMaterial, backSurface, frontSurface, true, true);
+  populateDepths(position, texcoord);
+  createViewPositions(position, texcoord, true, true);
 
   // CONVERT FRAME TO HDR
   buffers.tex0.rgb = toFrameHDR(buffers.tex0.rgb);
 
   // CALCULATE REFRACTION OFFSET
-  // TODO: Refraction.
+  vec2 refractOffset = getRefractionOffset(texcoord, position.viewPositionFront);
 
   // DRAW REFRACTION
-  // TODO: Refraction.
+  buffers.tex0.rgb = drawRefraction(buffers.tex0.rgb, texcoord, refractOffset);
 
   // APPLY FRONT ALBEDO TO FRAME
   buffers.tex0.rgb *= (any(greaterThan(frontSurface.albedo, vec3(0.0)))) ? frontSurface.albedo : vec3(1.0);
 
   // DRAW DEPTH FOG
-  // TODO: Depth fog.
+  buffers.tex0.rgb = drawWaterFog(buffers.tex0.rgb, refractOffset, lighting[0]);
 
   // DRAW VOLUMETRIC FOG
   // TODO: Volumetric fog.

@@ -29,6 +29,8 @@ flat(vec3) lightVector;
 
 flat(vec4) timeVector;
 
+flat(mat2x3) lighting;
+
 // UNIFORM
 uniform sampler2D colortex1;
 uniform sampler2D colortex2;
@@ -93,11 +95,6 @@ void main() {
 
   // DRAW SKY
   buffers.tex0.rgb = drawSky(buffers.tex0.rgb, position.viewPositionBack, 0);
-
-  // CALCULATE ATMOSPHERE LIGHTING COLOURS
-  mat2x3 lighting = mat2x3(0.0);
-
-  #include "/lib/composite/AtmosphereLighting.glsl"
 
   // PERFORM SHADING ON FRAME
   float frontOcclusion = 0.0;
