@@ -30,12 +30,12 @@
     float reprojectedMaterial = texture2D(colortex3, texcoord + refractOffset).b;
 
     if(
-      any(greaterThan(abs((texcoord + reprojectedMaterial) - 0.5), vec2(0.5))) || (
+      any(greaterThan(abs((texcoord + refractOffset) - 0.5), vec2(0.5))) || (
         reprojectedMaterial != frontSurface.material
       )
     ) return vec2(0.0);
 
-    return surfaceRefraction - viewRefraction;
+    return refractOffset;
 
     #undef viewRefraction
     #undef surfaceRefraction

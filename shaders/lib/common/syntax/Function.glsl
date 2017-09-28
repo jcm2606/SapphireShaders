@@ -81,4 +81,7 @@
 
   #define getLinearDepth(depth) linearDepth(depth, near, far)
   float linearDepth(in float depth, in float near, in float far) { return 2.0 * near * far / (far + near - (depth * 2.0 - 1.0) * (far - near)); }
+
+  #define getExpDepth(depth) expDepth(depth, near, far)
+  float expDepth(in float dist, in float near, in float far) { return (far * (dist - near)) / (dist * (far - near)); }
 #endif

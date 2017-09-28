@@ -27,15 +27,16 @@
 
       position *= 0.0011;
 
+      position *= rot;
       position *= rot; height += texnoise2D(noisetex, position + move);
-      position *= rot; height -= texnoise2D(noisetex, position * 2.0 + move * 2.0) * 0.5;
-      position *= rot; height += texnoise2D(noisetex, position * 4.0 + move * 4.0) * 0.25;
-      position *= rot; height += texnoise2D(noisetex, position * 8.0 + move * 8.0) * 0.125;
-      position *= rot; height += texnoise2D(noisetex, position * 16.0 + move * 16.0) * 0.0625;
+      position *= rot; height -= texnoise2D(noisetex, position * 2.0 + (move * 2.0)) * 0.5;
+      position *= rot; height += texnoise2D(noisetex, position * 4.0 + (move * 4.0)) * 0.25;
+      position *= rot; height += texnoise2D(noisetex, position * 8.0 + (move * 8.0)) * 0.125;
+      position *= rot; height += texnoise2D(noisetex, position * 16.0 + (move * 16.0)) * 0.0625;
 
       height *= 0.2;
 
-      return 1.0 - pow(-(height * 2.0 - 1.0), 5.0) * 3.0;
+      return 1.0 - powi(abs(height * 2.0 - 1.0), 3) * 3.0;
     }
 
     float water1(in vec3 world) {
@@ -130,9 +131,9 @@
       height4 = getHeight(world + vec3(0.0, 0.0, -normalDelta), material);
 
       vec2 delta = vec2(
-        ((height1 - height0) + (height0 - height2)) * normalDeltaRCP,
-        ((height3 - height0) + (height0 - height4)) * normalDeltaRCP
-      );
+        ((height1 - height0) + (height0 - height2)),
+        ((height3 - height0) + (height0 - height4))
+      ) * normalDeltaRCP;
 
       #undef height1
       #undef height2

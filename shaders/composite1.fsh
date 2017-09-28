@@ -51,6 +51,8 @@ uniform mat4 gbufferModelViewInverse;
 uniform mat4 shadowProjection;
 uniform mat4 shadowModelView;
 
+uniform vec3 cameraPosition;
+
 uniform float viewWidth;
 uniform float viewHeight;
 uniform float near;
@@ -70,6 +72,7 @@ NewPositionObject(position);
 NewSurfaceObject(backSurface);
 NewSurfaceObject(frontSurface);
 NewMaterialObject(backMaterial);
+NewMaterialObject(frontMaterial);
 
 // ARBITRARY
 // INCLUDES
@@ -81,12 +84,14 @@ NewMaterialObject(backMaterial);
 
 #include "/lib/composite/Shading.glsl"
 
+#include "/lib/composite/Volumetrics.glsl"
+
 // MAIN
 void main() {
   // POPULATE OBJECTS
   populateBufferObject(buffers, texcoord);
   populateSurfaces(backSurface, frontSurface, buffers, true, true);
-  populateMaterialObject(backMaterial, backSurface);
+  populateMaterials(backMaterial, frontMaterial, backSurface, frontSurface, true, true);
   populateDepths(position, texcoord);
   createViewPositions(position, texcoord, true, true);
 
@@ -100,8 +105,8 @@ void main() {
   float frontOcclusion = 0.0;
   buffers.tex0.rgb = getShadedFragment(frontOcclusion, buffers.tex0.rgb, lighting);
 
-  // SAMPLE VOLUMETRIC FOG
-  // TODO: Volumetric fog.
+  // SAMPLE VOLUMETRICS
+  buffers.tex6.rgb = getVolumetrics(lighting, position.viewPositionBack);
 
   // SEND FRONT SHADOW DOWN FOR SPECULAR HIGHLIGHT
   buffers.tex0.a = frontOcclusion;

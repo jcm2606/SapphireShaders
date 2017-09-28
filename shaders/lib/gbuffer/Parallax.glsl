@@ -68,14 +68,14 @@
             (comparef(material, MATERIAL_STAINED_GLASS, ubyteMaxRCP)) ? PARALLAX_TRANSPARENT_HEIGHT_GLASS : 0.0
           )
         )
-      );
+      ) * stepsRCP;
 
-      float waveHeight = getHeight(world, material) * height * stepsRCP;
+      float waveHeight = getHeight(world, material) * height;
 
       for(int i = 0; i < steps; i++) {
         world.xz = waveHeight * view.xy + world.xz;
 
-        waveHeight = getHeight(world, material) * height * stepsRCP;
+        waveHeight = getHeight(world, material) * height;
       }
 
       return world;

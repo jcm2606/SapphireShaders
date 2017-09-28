@@ -33,7 +33,7 @@
     shadowPositionBack = getShadowPosition(getWorldPosition(position.viewPositionBack));
     shadowPositionSolid = getShadowPosition(getWorldPosition(position.viewPositionBack));
     
-    c(float) shadowBias = 0.0001;
+    c(float) shadowBias = 0.0003;
     shadowPositionFront.z -= shadowBias;
     shadowPositionBack.z -= shadowBias;
     shadowPositionSolid.z -= shadowBias;
@@ -49,11 +49,9 @@
     #define blockerFront blocker.x
     #define blockerBack blocker.y
 
-    vec2 offset = vec2(0.0);
-
     for(int i = -1; i <= 1; i++) {
       for(int j = -1; j <= 1; j++) {
-        offset = (vec2(i, j) + 0.5) * rotation * blockerSearchWidth;
+        vec2 offset = (vec2(i, j) + 0.5) * rotation * blockerSearchWidth;
 
         blockerFront += texture2DLod(shadowtex0, distortShadowPosition(offset + shadowPositionSolid.xy, 1), blockerSearchLOD).x;
         blockerBack += texture2DLod(shadowtex1, distortShadowPosition(offset + shadowPositionBack.xy, 1), blockerSearchLOD).x;
@@ -83,12 +81,9 @@
 
     c(float) weight = 1.0 / pow(float(shadowQuality) * 2.0 + 1.0, 2.0);
 
-    mat2 offsets = mat2(0.0);
-    vec3 depths = vec3(0.0);
-
-    for(int i = -shadowQuality; i <= shadowQuality; i++) {
-      for(int j = -shadowQuality; j <= shadowQuality; j++) {
-        offsets = mat2(
+    for(int i = -SHADOW_FILTER_QUALITY; i <= SHADOW_FILTER_QUALITY; i++) {
+      for(int j = -SHADOW_FILTER_QUALITY; j <= SHADOW_FILTER_QUALITY; j++) {
+        mat2 offsets = mat2(
           vec2(i, j) * widthFront,
           vec2(i, j) * widthBack
         );
@@ -96,17 +91,16 @@
         #define offsetFront offsets[0]
         #define offsetBack offsets[1]
 
-        depths = vec3(
+        vec2 depths = vec2(
           texture2D(shadowtex1, distortShadowPosition(offsetBack + shadowPositionBack.xy, 1)).x,
-          texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).x,
-          texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionFront.xy, 1)).x
+          texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).x
         );
 
         shadowObject.depth += depths.xy;
 
         shadowObject.occlusion.x += ceil(compareShadow(depths.x, shadowPositionBack.z));
         shadowObject.occlusion.y += ceil(compareShadow(depths.y, shadowPositionBack.z));
-        shadowObject.occlusion.z += ceil(compareShadow(depths.z, shadowPositionFront.z));
+        shadowObject.occlusion.z += ceil(compareShadow(texture2D(shadowtex0, distortShadowPosition(offsetFront + shadowPositionFront.xy, 1)).x, shadowPositionFront.z));
 
         shadowObject.colour += texture2D(shadowcolor0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).rgb;
 

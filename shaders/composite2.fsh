@@ -15,6 +15,8 @@
 #include "/lib/Syntax.glsl"
 
 // CONST
+const bool colortex6MipmapEnabled = true;
+
 // USED BUFFERS
 #define IN_TEX0
 #define IN_TEX1
@@ -37,6 +39,7 @@ uniform sampler2D colortex1;
 uniform sampler2D colortex2;
 uniform sampler2D colortex3;
 uniform sampler2D colortex4;
+uniform sampler2D colortex6;
 
 uniform sampler2D depthtex0;
 uniform sampler2D depthtex1;
@@ -53,6 +56,8 @@ uniform int isEyeInWater;
 uniform float near;
 uniform float far;
 uniform float frameTimeCounter;
+uniform float viewWidth;
+uniform float viewHeight;
 
 uniform vec3 cameraPosition;
 
@@ -79,6 +84,8 @@ NewMaterialObject(frontMaterial);
 
 #include "/lib/composite/Refraction.glsl"
 
+#include "/lib/composite/Volumetrics.glsl"
+
 // MAIN
 void main() {
   // POPULATE OBJECTS
@@ -104,7 +111,7 @@ void main() {
   buffers.tex0.rgb = drawWaterFog(buffers.tex0.rgb, refractOffset, lighting[0]);
 
   // DRAW VOLUMETRIC FOG
-  // TODO: Volumetric fog.
+  buffers.tex0.rgb = drawVolumetrics(buffers.tex0.rgb, texcoord, refractOffset);
 
   // PERFORM DEBUGGING
   Debug();

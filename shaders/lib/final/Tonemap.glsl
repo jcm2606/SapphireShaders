@@ -32,7 +32,7 @@
   c(OptionsUC2) uc2Preset = uc2Preset0;
 
   vec3 operatorUC2(c(in OptionsUC2) options, in vec3 colour) {
-    return ((colour * (options.A * colour + (options.C * options.B)) + options.D * options.E) / (colour * (options.A * colour + options.B) + (options.D * options.F))) - options.E / options.F;
+    return ((colour * (options.A * colour + (options.C * options.B)) + (options.D * options.E)) / (colour * (options.A * colour + options.B) + (options.D * options.F))) - options.E / options.F;
   }
 
   vec3 tonemapUC2(in vec3 colour) {

@@ -43,7 +43,7 @@
     vec4 specular = raytraceClip(-reflect(dir, normal), view, texcoord, position.depthFront);
 
     // SAMPLE SKY IN REFLECTED DIRECTION
-    vec3 sky = drawSky(diffuse, reflView, 2);
+    vec3 sky = drawSky(diffuse, reflView, 2) * 2.5;
 
     // TODO: Volumetric clouds.
 

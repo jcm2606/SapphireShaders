@@ -48,15 +48,17 @@ uniform float frameTimeCounter;
 void main() {
   vec4 albedo = texture2D(texture, uvcoord) * colour;
 
-  vec3 customNormal = vec3(0.0);
-  if(comparef(material, MATERIAL_WATER, ubyteMaxRCP) || comparef(material, MATERIAL_ICE, ubyteMaxRCP) || comparef(material, MATERIAL_STAINED_GLASS, ubyteMaxRCP)) customNormal = getNormal(world, material);
+  vec4 customNormal = vec4(0.0);
+  if(comparef(material, MATERIAL_WATER, ubyteMaxRCP) || comparef(material, MATERIAL_ICE, ubyteMaxRCP) || comparef(material, MATERIAL_STAINED_GLASS, ubyteMaxRCP)) {
+    customNormal.xyz = getNormal(world, material);
+    customNormal.a = getHeight(world, material);
+  }
 
   if(comparef(material, MATERIAL_WATER, ubyteMaxRCP)) {
-    float oldArea = flength(dFdx(world)) * flength(dFdy(world));
-    vec3 refractPos = refract(fnormalize(world), customNormal, refractInterfaceAirWater);
+    vec3 refractPos = refract(fnormalize(world), customNormal.xyz, refractInterfaceAirWater);
     float newArea = flength(dFdx(refractPos)) * flength(dFdy(refractPos));
 
-    albedo.rgb = toGamma(vec3((pow(oldArea / newArea, 0.1))));
+    albedo.rgb = toGamma(vec3(mix(mix(0.35, 0.5, customNormal.a), 1.5, pow((flength(dFdx(world)) * flength(dFdy(world))) / newArea, 0.2))));
   }
 
   albedo.rgb = toShadowLDR(albedo.rgb);

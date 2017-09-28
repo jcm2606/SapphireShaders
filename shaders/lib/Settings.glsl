@@ -71,4 +71,7 @@
 
   c(float) materialRange = 255.0;
   cRCP(float, materialRange);
+
+  c(float) shadowDepthBlocks = 256.0; // How many blocks does the depth encompass? A depth of 1.0 represents X blocks.
+  c(float) shadowDepthMult = 256 / shadowDepthBlocks;
 #endif

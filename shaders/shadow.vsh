@@ -71,6 +71,7 @@ void main() {
   shadow = gl_Position.xyz;
 
   gl_Position.xy = distortShadowPosition(gl_Position.xy, 0);
+  gl_Position.z *= shadowDepthMult;
 
   ttn = mat3(0.0);
 
