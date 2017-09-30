@@ -117,6 +117,8 @@
 
     shadowObject.difference = max0(shadowObject.occlusion.x - shadowObject.occlusion.y);
 
+    shadowObject.dist = max0(shadowPositionBack.z - shadowObject.depth.y) * shadowDepthBlocks;
+
     #undef widthFront
     #undef widthBack
 

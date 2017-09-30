@@ -55,7 +55,8 @@ void main() {
   }
 
   if(comparef(material, MATERIAL_WATER, ubyteMaxRCP)) {
-    vec3 refractPos = refract(fnormalize(world), customNormal.xyz, refractInterfaceAirWater);
+    vec3 nworld = fnormalize(world);
+    vec3 refractPos = refract(nworld, customNormal.xyz, refractInterfaceAirWater);
     float newArea = flength(dFdx(refractPos)) * flength(dFdy(refractPos));
 
     albedo.rgb = toGamma(vec3(mix(mix(0.35, 0.5, customNormal.a), 1.5, pow((flength(dFdx(world)) * flength(dFdy(world))) / newArea, 0.2))));

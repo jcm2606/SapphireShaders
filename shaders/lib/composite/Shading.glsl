@@ -8,6 +8,8 @@
 #ifndef INT_INCLUDED_COMPOSITE_SHADING
   #define INT_INCLUDED_COMPOSITE_SHADING
 
+  #include "/lib/composite/WaterAbsorption.glsl"
+
   #include "/lib/composite/Shadows.glsl"
 
   #include "/lib/common/util/DiffuseModel.glsl"
@@ -19,7 +21,7 @@
     getShadows(shadowObject);
 
     float directShading = (backMaterial.foliage > 0.5) ? 1.0 : DirectShadingModel(fnormalize(position.viewPositionBack), lightVector, backSurface.normal, backSurface.roughness);
-    vec3 directTint = mix(vec3(shadowObject.occlusion.y), shadowObject.colour, shadowObject.difference);
+    vec3 directTint = mix(vec3(shadowObject.occlusion.y), interactWater(shadowObject.colour, impurityColour, shadowObject.dist) * diffuseWater(shadowObject.dist), shadowObject.difference);
 
     float ambientShading = cflattenf(DirectShadingModel(fnormalize(position.viewPositionBack), upVector, backSurface.normal, backSurface.roughness), 0.65);
 

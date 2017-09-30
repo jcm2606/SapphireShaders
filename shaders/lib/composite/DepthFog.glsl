@@ -33,6 +33,6 @@
       vec3(0.0),
       colour * absorbWater(dist),
       exp2(-dist * WATER_IMPURITY)
-    );
+    ) * diffuseWater(dist);
   }
 #endif

@@ -11,20 +11,42 @@
   #if   STAGE == COMPOSITE1
     #include "/lib/composite/WaterAbsorption.glsl"
 
+    #include "/lib/common/util/Noise.glsl"
+
     // OPTIONS
     c(int) steps = 8;
     cRCP(float, steps);
     c(float) finalMult = stepsRCP * 1.0;
 
-    // MARCHER
-    vec3 getWaterInteraction(in vec3 colour, in vec3 lightColour, in float occlusion, in float dist) {
-      return mix(
-        impurityColour * lightColour * absorbWater(dist),
-        colour * absorbWater(dist),
-        (exp2(-dist * WATER_IMPURITY))
-      );
+    // FOG
+    float getVolumeFog(in vec3 world) {
+      float fog = 0.0;
+
+      c(float) windDirection = 0.7;
+
+      c(float) fogSpeed = 0.3;
+      c(vec3) fogDirection = swizzle3 * fogSpeed;
+      vec3 move = fogDirection * frametime;
+
+      c(mat2) rot = rot2(windDirection);
+
+      vec3 pos = world;
+      pos *= vec3(1.0, 2.0, 1.0) * 0.7;
+
+      pos.xz *= rot;
+      pos.xz *= rot; fog += texnoise3D(noisetex, pos + move);
+      pos.xz *= rot; fog -= texnoise3D(noisetex, pos * 2.0 + (move * 2.0)) * 0.5;
+      pos.xz *= rot; fog += texnoise3D(noisetex, pos * 4.0 + (move * 4.0)) * 0.25;
+
+      fog *= 0.2;
+
+      fog *= exp2(-abs(world.y - MC_SEA_LEVEL) * 0.4);
+
+      return fog * 64.0;
     }
-    
+
+
+    // MARCHER    
     vec3 getVolumetrics(in mat2x3 lighting, in vec3 view) {
       vec3 colour = vec3(0.0);
 
@@ -36,7 +58,7 @@
       // RAYS
       // For volumetrics to work properly, I need access to the view, world, and shadow positions simultaneously.
       // This requires multiple rays to be present, so to save on performance, I do everything outside the loop, and just step the rays inside the loop.
-      float dither = bayer16(ivec2(int(texcoord.x * viewWidth), int(texcoord.y * viewHeight)));
+      float dither = bayer64(ivec2(int(texcoord.x * viewWidth), int(texcoord.y * viewHeight)));
 
       mat4 worldToShadow = shadowProjection * shadowModelView;
 
@@ -83,23 +105,43 @@
       shadowPos = shadowStep * dither + shadowStart;
 
       // MARCHING LOOP
-      float weight = flength(shadowStep);
+      #if 1
+        float weight = flength(shadowStep);
+      #else
+        #define weight flength(shadowPos)
+      #endif
 
       vec3 absorbPos = (isEyeInWater == 1) ? viewStart : position.viewPositionFront;
 
+      vec3 shadow = vec3(0.0);
+      vec3 world = vec3(0.0);
+
+      float depthFront = 0.0;
+      float depthView = 0.0;
+      
+      float distSurface = 0.0;
+      float distEye = 0.0;
+
+      vec2 occlusionVector = vec2(0.0);
+
+      vec2 visibility = vec2(0.0);
+
+      vec3 rayColour = vec3(0.0);
+      vec3 lightColour = vec3(0.0);
+
+      vec3 shadowColour = vec3(0.0);
+
       for(int i = 0; i < steps; i++, viewPos += viewStep, worldPos += worldStep, shadowPos += shadowStep) {
         // POSITIONS
-        vec3 shadow = vec3(distortShadowPosition(shadowPos.xy, 0), shadowPos.z) * 0.5 + 0.5;
-        vec3 world = worldPos + cameraPosition;
+        shadow = vec3(distortShadowPosition(shadowPos.xy, 0), shadowPos.z) * 0.5 + 0.5;
+        world = worldPos + cameraPosition;
 
         // DEPTHS
-        float depthFront = texture2D(shadowtex0, shadow.xy).x;
-        float depthView = getExpDepth(viewPos.z);
-
-        float penetration = max0(shadow.z - depthFront) * shadowDepthBlocks;
+        depthFront = texture2D(shadowtex0, shadow.xy).x;
+        depthView = getExpDepth(viewPos.z);
 
         // OCCLUSION
-        vec2 occlusionVector = vec2(0.0);
+        occlusionVector = vec2(0.0);
 
         #define occlusionBack occlusionVector.x
         #define occlusionFront occlusionVector.y
@@ -107,34 +149,49 @@
         occlusionBack = compareShadow(texture2D(shadowtex1, shadow.xy).x, shadow.z);
         occlusionFront = compareShadow(depthFront, shadow.z);
 
-        // VISIBILITY
-        float visibility = 0.0;
+        // DISTANCES
+        distSurface = max0(shadow.z - depthFront) * shadowDepthBlocks;
+        distEye =  distance(absorbPos, (!(occlusionBack - occlusionFront > 0.0)) ? position.viewPositionFront : viewPos);
 
-        if(occlusionBack - occlusionFront > 0.0) visibility += 4.0;
+        // VISIBILITY
+        visibility = vec2(0.0);
 
         // PARTICIPATING MEDIA
         // HEIGHT FOG
-        visibility += exp2(-max0(world.y - MC_SEA_LEVEL) * 0.05) * 4.0;
+        visibility += exp2(-max0(world.y - MC_SEA_LEVEL) * 0.05);
+
+        // VOLUME FOG
+        visibility += getVolumeFog(world);
+
+        // WATER
+        visibility = (occlusionBack - occlusionFront > 0.0) ? vec2(8.0) : visibility;
 
         // VISIBILITY OCCLUSION
-        visibility *= occlusionBack;
+        #ifdef VOLUMETRICS_SKY_SHADOW
+          visibility *= occlusionBack;
+        #else
+          visibility.x *= occlusionBack;
+        #endif
 
         // COLOUR
-        vec3 rayColour = lighting[0] * visibility + (lighting[1] * visibility);
-        vec3 lightColour = rayColour;
+        rayColour = lighting[0] * visibility.x + (lighting[1] * visibility.y);
+        lightColour = rayColour;
 
-        vec3 shadowColour = toLinear(toShadowHDR(texture2D(shadowcolor0, shadow.xy).rgb));
+        shadowColour = toLinear(toShadowHDR(texture2D(shadowcolor0, shadow.xy).rgb));
         rayColour *= (occlusionBack - occlusionFront > 0.0) ? shadowColour : vec3(1.0);
 
         // VOLUME INTERACTION
-        // SOURCE -> RAY WATER ABSORPTION
-        rayColour = (occlusionBack - occlusionFront > 0.0) ? getWaterInteraction(rayColour, lightColour, occlusionBack, penetration) : rayColour;
+        // SOURCE -> RAY WATER ABSORPTION & SCATTERING
+        rayColour = (occlusionBack - occlusionFront > 0.0) ? getWaterLightInteraction(rayColour, lightColour, distSurface) : rayColour;
 
-        // RAY -> EYE WATER ABSORPTION
-        rayColour = (occlusionBack - occlusionFront > 0.0 || (isEyeInWater == 1 && frontMaterial.water > 0.5)) ? getWaterInteraction(rayColour, lightColour, occlusionBack, distance(
-          absorbPos,
-          (!(occlusionBack - occlusionFront > 0.0)) ? position.viewPositionFront : viewPos
-        )) : rayColour;
+        // RAY -> EYE WATER ABSORPTION & SCATTERING
+        rayColour = (occlusionBack - occlusionFront > 0.0 || (isEyeInWater == 1 && frontMaterial.water > 0.5)) ? getWaterLightInteraction(rayColour, lightColour, distEye) : rayColour;
+
+        // SOURCE -> RAY WATER DIFFUSION
+        rayColour *= diffuseWater(distSurface);
+
+        // RAY -> EYE WATER DIFFUSION
+        rayColour *= diffuseWater(distEye);
 
         // ACCUMULATION
         colour = rayColour * weight + colour;
@@ -164,22 +221,24 @@
     }
   #elif STAGE == COMPOSITE2
     vec3 drawVolumetrics(in vec3 background, in vec2 texcoord, in vec2 refractOffset) {
-      c(int) width = 2;
+      c(int) width = 3;
       cRCP(float, width);
       c(float) weight = 1.0 / pow(float(width) * 2.0 + 1.0, 2.0);
       c(float) threshold = 0.001;
 
-      float rotAngle = dither64(ivec2(int(texcoord.x * viewWidth), int(texcoord.y * viewHeight))) * tau;
+      float rotAngle = bayer64(ivec2(int(texcoord.x * viewWidth), int(texcoord.y * viewHeight))) * tau;
       mat2 rotation = rot2(rotAngle);
 
-      vec2 radius = vec2(0.002) * widthRCP * rotation;
+      vec2 radius = vec2(0.003) * widthRCP * rotation;
       vec2 refraction = refractOffset * frontMaterial.water;
 
       vec4 volumetrics = vec4(0.0);
 
       for(int i = -width; i <= width; i++) {
         for(int j = -width; j <= width; j++) {
-          volumetrics += texture2DLod(colortex6, vec2(i, j) * radius + (refraction + texcoord), 2);
+          vec2 offset = vec2(i, j) * radius + texcoord;
+
+          volumetrics += texture2DLod(colortex6, texcoord + refraction, 2);
         }
       }
 

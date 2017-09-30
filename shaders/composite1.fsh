@@ -44,6 +44,8 @@ uniform sampler2D shadowtex1;
 uniform sampler2D shadowcolor0;
 uniform sampler2D shadowcolor1;
 
+uniform sampler2D noisetex;
+
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelView;
@@ -58,6 +60,7 @@ uniform float viewHeight;
 uniform float near;
 uniform float far;
 uniform float rainStrength;
+uniform float frameTimeCounter;
 
 uniform int isEyeInWater;
 
