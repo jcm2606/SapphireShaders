@@ -19,7 +19,7 @@
     c(float) finalMult = stepsRCP * 1.0;
 
     // FOG
-    float getVolumeFog(in vec3 world) {
+    float getGroundFog(in vec3 world) {
       float fog = 0.0;
 
       c(float) windDirection = 0.7;
@@ -41,9 +41,11 @@
       fog *= 0.4;
       //fog = 1.0;
 
+      fog = fog * 0.75 + 0.25;
+
       fog *= exp2(-abs(world.y - MC_SEA_LEVEL) * 0.4);
 
-      return fog * 4.0;
+      return fog * fogDensityGround;
     }
 
     // MARCHER    
@@ -54,14 +56,8 @@
 
       vec3 colour = vec3(0.0);
 
-      // WORLD LIGHT POSITION
-      vec3 light = getWorldPosition(lightVector);
-
-      // EYE BRIGHTNESS
-      c(float) skyAttenuation = LIGHTMAPS_SKY_ATTENUATION;
-      c(float) attenuation = skyAttenuation;
-
-      float ebs = pow(getEBS().y, attenuation);
+      // LIGHTING TWEAKS
+      lighting[0] *= 2.0;
 
       // BACK DEPTH
       mat2x3 nViewPosition = mat2x3(
@@ -69,6 +65,18 @@
         fnormalize(position.viewPositionFront)
       );
       float backDepthRCP = 1.0 / nViewPosition[0].z;
+
+      // WORLD LIGHT POSITION
+      vec3 light = fnormalize(getWorldPosition(lightVector));
+
+      // MIE TAIL
+      //float mieTail = dot(nViewPosition)
+
+      // EYE BRIGHTNESS
+      c(float) skyAttenuation = LIGHTMAPS_SKY_ATTENUATION;
+      c(float) attenuation = skyAttenuation;
+
+      float ebs = pow(getEBS().y, attenuation);
 
       // RAYS
       // For volumetrics to work properly, I need access to the view, world, and shadow positions simultaneously.
@@ -182,17 +190,17 @@
 
         // PARTICIPATING MEDIA
         // HEIGHT FOG
-        visibility += exp2(-max0(world.y - MC_SEA_LEVEL) * 0.05) * 1.3;
+        visibility += exp2(-max0(world.y - MC_SEA_LEVEL) * 0.05) * fogDensityHeight;
 
         // VOLUME FOG
-        visibility += getVolumeFog(world);
+        visibility += getGroundFog(world);
 
         // WATER
         visibility = (occlusionBack - occlusionFront > 0.0 && water) ? vec2(4.0) : visibility;
 
         // VISIBILITY OCCLUSION
         #ifdef VOLUMETRICS_SHADOW_SKY_APPROXIMATION
-          visibility *= vec2(occlusionBack, (isEyeInWater == 1 || (viewPos.z > fnormalize(position.viewPositionFront).z && frontMaterial.water > 0.5)) ? occlusionBack : mix(ebs, (viewPos.z < position.viewPositionFront.z) ? frontSurface.skyLight : backSurface.skyLight, (!getLandMask(position.depthBack)) ? 0.0 : pow4(distance(viewStart, viewPos) / viewDist)));
+          visibility *= vec2(occlusionBack, (isEyeInWater == 1 || (viewPos.z < position.viewPositionFront.z && frontMaterial.water > 0.5)) ? occlusionBack : mix(ebs, (viewPos.z < position.viewPositionFront.z) ? frontSurface.skyLight : backSurface.skyLight, (!getLandMask(position.depthBack)) ? 0.0 : pow4(distance(viewStart, viewPos) / viewDist)));
         #else
           visibility *= occlusionBack;
         #endif
