@@ -64,6 +64,8 @@ uniform float frameTimeCounter;
 
 uniform int isEyeInWater;
 
+uniform ivec2 eyeBrightnessSmooth;
+
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"
 #include "/lib/composite/struct/StructPosition.glsl"

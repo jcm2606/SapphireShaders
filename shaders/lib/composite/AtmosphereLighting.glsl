@@ -9,8 +9,8 @@
   #define INT_INCLUDED_COMPOSITE_ATMOSPHERELIGHTING
 
   lighting[0]  = drawSky(vec3(0.0), lightVector, 1);
-  lighting[0] *= 0.03;
+  lighting[0] *= 0.05;
 
   lighting[1]  = drawSky(vec3(0.0), upVector, 1);
-  lighting[1] *= 4.0;
+  lighting[1] *= 8.0;
 #endif

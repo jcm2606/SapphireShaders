@@ -21,7 +21,7 @@
     c(float) viewRefractionStrength = 0.03;
     viewRefraction = frontSurface.normal.xy * viewRefractionStrength * ((isEyeInWater == 0) ? refractInterfaceAirWater : refractInterfaceWaterAir);
 
-    float surfaceRefractionStrength = 0.007;
+    float surfaceRefractionStrength = 0.009;
     surfaceRefractionStrength /= getLinearDepth(position.depthFront) * 0.25;
     surfaceRefraction = getNormal(getWorldPosition(view) + cameraPosition, frontMaterial.rawMaterial).xy * surfaceRefractionStrength;
 

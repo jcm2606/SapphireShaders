@@ -65,6 +65,7 @@ void main() {
   albedo.rgb = toShadowLDR(albedo.rgb);
 
   gl_FragData[0] = albedo;
+  gl_FragData[1] = vec4(vec3(0.0), material * materialRangeRCP);
 }
 
 #undef uvcoord

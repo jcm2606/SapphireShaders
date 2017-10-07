@@ -32,7 +32,7 @@
     return mix(
       vec3(0.0),
       colour * absorbWater(dist),
-      exp2(-dist * WATER_IMPURITY)
+      exp2(-dist * waterImpurity * 2.0)
     ) * diffuseWater(dist);
   }
 #endif

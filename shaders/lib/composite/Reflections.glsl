@@ -32,7 +32,7 @@
     vec3 dir = -fnormalize(view);
     vec3 normal = fnormalize(selectSurface().normal);
     float roughness = selectSurface().roughness;
-    vec2 alpha = pow2(vec2(roughness * 1.45, roughness * 1.2));
+    vec2 alpha = pow2(vec2(roughness * 2.45, roughness * 1.6));
     float f0 = selectSurface().f0;
     float metallic = (f0 > 0.5) ? 1.0 : 0.0;
 

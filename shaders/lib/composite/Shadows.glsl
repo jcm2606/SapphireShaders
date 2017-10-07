@@ -39,12 +39,16 @@
     shadowPositionSolid.z -= shadowBias;
 
     // FIND BLOCKERS
-    float rotAngle = dither64(ivec2(int(texcoord.x * viewWidth), int(texcoord.y * viewHeight))) * tau;
+    float rotAngle = bayer64(ivec2(int(texcoord.x * viewWidth), int(texcoord.y * viewHeight))) * tau;
     mat2 rotation = rot2(rotAngle);
 
+    float blockerDepth = 0.0;
     vec2 blocker = vec2(0.0);
     c(float) blockerSearchWidth = 0.001;
-    c(int) blockerSearchLOD = 0;
+    c(int) blockerSearchLOD = 1;
+
+    float centerDepth = texture2DLod(shadowtex1, distortShadowPosition(shadowPositionSolid.xy, 1), blockerSearchLOD).x;
+    vec2 blockerWeight = vec2(0.0);
 
     #define blockerFront blocker.x
     #define blockerBack blocker.y
@@ -53,23 +57,34 @@
       for(int j = -1; j <= 1; j++) {
         vec2 offset = (vec2(i, j) + 0.5) * rotation * blockerSearchWidth;
 
-        blockerFront += texture2DLod(shadowtex0, distortShadowPosition(offset + shadowPositionSolid.xy, 1), blockerSearchLOD).x;
+        blockerDepth = texture2DLod(shadowtex0, distortShadowPosition(offset + shadowPositionSolid.xy, 1), blockerSearchLOD).x;
+
+        blockerFront += blockerDepth;
         blockerBack += texture2DLod(shadowtex1, distortShadowPosition(offset + shadowPositionBack.xy, 1), blockerSearchLOD).x;
+
+        blockerWeight.y += (max0(blockerDepth - centerDepth) + max0(centerDepth - blockerDepth));
       }
     }
     
     c(float) iterRCP = 1.0 / 9.0;
     blocker *= iterRCP;
+    blockerWeight *= iterRCP;
+
+    blockerWeight = clamp01(floor(blockerWeight * 256.0));
+    blockerWeight.x = 1.0;
+
+    //shadowObject.dist = blockerWeight.y; return;
 
     // SAMPLE SHADOWS WITH PERCENTAGE-CLOSER FILTER
-    c(float) lightDistance = 64.0;
+    c(float) lightDistance = 32.0;
     cRCP(float, lightDistance);
     c(int) shadowQuality = SHADOW_FILTER_QUALITY;
     cRCP(float, shadowQuality);
 
     c(float) minWidth = 0.00001;
+    c(float) maxWidth = 0.00075;
     //vec2 width = max(vec2(minWidth), vec2(shadowPositionFront.z, shadowPositionBack.z) - blocker * lightDistance) * shadowQualityRCP;
-    vec2 width = max(vec2(minWidth), (vec2(shadowPositionSolid.z, shadowPositionBack.z) - blocker) * lightDistanceRCP) * shadowQualityRCP;
+    vec2 width = clamp((vec2(shadowPositionSolid.z, shadowPositionBack.z) - blocker) * lightDistanceRCP * blockerWeight, vec2(minWidth), vec2(maxWidth)) * shadowQualityRCP;
 
     mat2 widths = mat2(
       vec2(width.x) * rotation,
@@ -104,6 +119,8 @@
 
         shadowObject.colour += texture2D(shadowcolor0, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).rgb;
 
+        shadowObject.material += texture2D(shadowcolor1, distortShadowPosition(offsetFront + shadowPositionBack.xy, 1)).a;
+
         #undef offsetFront
         #undef offsetBack
       }
@@ -112,12 +129,15 @@
     shadowObject.depth *= weight;
     shadowObject.occlusion *= weight;
     shadowObject.colour *= weight;
+    shadowObject.material *= weight;
 
     shadowObject.colour = toLinear(toShadowHDR(shadowObject.colour));
 
     shadowObject.difference = max0(shadowObject.occlusion.x - shadowObject.occlusion.y);
 
     shadowObject.dist = max0(shadowPositionBack.z - shadowObject.depth.y) * shadowDepthBlocks;
+
+    shadowObject.material *= materialRange;
 
     #undef widthFront
     #undef widthBack

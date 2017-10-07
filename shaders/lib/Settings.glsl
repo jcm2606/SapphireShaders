@@ -30,6 +30,7 @@
   const float sunPathRotation = -30.0;
   const float centerDepthHalflife = 2.0;
   const float ambientOcclusionLevel = 0.0f; // This should be set to 0.0f to disable Minecraft's AO. Minecraft's AO breaks the encoding method used for albedo. [0.0f 1.0f]
+  const float eyeBrightnessHalflife = 10.0;
 
   // OPTION INCLUDES
   #include "/lib/option/Debugging.glsl"

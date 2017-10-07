@@ -14,13 +14,23 @@
   #endif
 
   // PUDDLES
-  // FEATURE: Puddles.
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_ENTITIES
+    vec4 puddle = getPuddle(world, 
+      #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
+        normalMap.a
+      #else
+        0.0
+      #endif
+    , material);
+  #else
+    vec4 puddle = vec4(0.0);
+  #endif
 
   // NORMAL
   vec3 surfaceNormal = normal;
 
   #if   SHADER == GBUFFERS_TERRAIN
-    float normalMaxAngle = mix(NORMAL_ANGLE_SOLID, NORMAL_ANGLE_WET, 0.0); // TODO: If you add puddles, change the 0.0 here to the puddle scalar.
+    float normalMaxAngle = mix(NORMAL_ANGLE_SOLID, NORMAL_ANGLE_WET, puddle.w); // TODO: If you add puddles, change the 0.0 here to the puddle scalar.
 
     surfaceNormal = normalMap.xyz * 2.0 - 1.0;
   #elif SHADER == GBUFFERS_HAND
@@ -49,7 +59,7 @@
   // ALBEDO
   #if   SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
     vec4 albedo = textureSample(texture, texcoord) * colour;
-  #elif SHADER == GBUFFERS_TEXTURED || SHADER == GBUFFERS_TEXTURED_LIT || SHADER == GBUFFERS_SKY_TEXTURED || SHADER == GBUFFERS_CLOUDS || SHADER == GBUFFERS_BEAM || SHADER == GBUFFERS_GLINT || SHADER == GBUFFERS_EYES || SHADER == GBUFFERS_WEATHER || SHADER == GBUFFERS_ENTITIES
+  #elif SHADER == GBUFFERS_TEXTURED || SHADER == GBUFFERS_TEXTURED_LIT || SHADER == GBUFFERS_SKY_TEXTURED || SHADER == GBUFFERS_CLOUDS || SHADER == GBUFFERS_BEAM || SHADER == GBUFFERS_GLINT || SHADER == GBUFFERS_EYES || SHADER == GBUFFERS_ENTITIES
     vec4 albedo = textureSample(texture, texcoord) * colour;
   #elif SHADER == GBUFFERS_WATER
     vec4 albedo = textureSample(texture, texcoord) * colour;
@@ -57,9 +67,14 @@
     if(comparef(material, MATERIAL_WATER, ubyteMaxRCP)) albedo.rgb = vec3(0.0);
   #elif SHADER == GBUFFERS_SKY_BASIC
     vec4 albedo = colour;
+  #elif SHADER == GBUFFERS_WEATHER
+    vec4 albedo = textureSample(texture, texcoord) * colour;
+    albedo.rgb = vec3(0.8, 0.9, 1.0);
   #elif SHADER == GBUFFERS_BASIC
     vec4 albedo = colour;
   #endif
+
+  //albedo.rgb = vec3(puddle.w);
 
   // SURFACE PROPERTIES
   vec4 surfaceProperties = SURFACE_PROPERTIES_DEFAULT;
@@ -69,7 +84,7 @@
   #define emission surfaceProperties.z
   #define porosity surfaceProperties.w
 
-  #if   SHADER == GBUFFERS_TERRAIN
+  #if   SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND
     vec4 specularMap = textureSample(specular, texcoord);
 
     #if   RESOURCE_FORMAT == 0
@@ -103,6 +118,10 @@
     surfaceProperties = (comparef(material, MATERIAL_ICE, ubyteMaxRCP)) ? SURFACE_PROPERTIES_ICE : surfaceProperties;
   #elif SHADER == GBUFFERS_ENTITIES
     surfaceProperties = SURFACE_PROPERTIES_ENTITIES;
+  #endif
+
+  #if SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_WATER || SHADER == GBUFFERS_ENTITIES
+    surfaceProperties = getPuddleSpecular(surfaceProperties, puddle.w);
   #endif
 
   c(float) roughnessMax = 0.9999999;

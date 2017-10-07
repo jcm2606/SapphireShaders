@@ -56,8 +56,8 @@
     vec3 viewAbsorb = absorb(thickness);
     vec4 scatterCoeff = 1.0 - exp(-thickness.xxxy * vec4(rayleighCoeff, mieCoeff));
 
-    vec3 scatterS = scatterCoeff.xyz * phaseRayleigh(VdotS) + (scatterCoeff.w * phaseMie(VdotS));
-    vec3 scatterM = scatterCoeff.xyz * phaseRayleigh(VdotM) + (scatterCoeff.w * phaseMie(VdotM));
+    vec3 scatterS = scatterCoeff.xyz * phaseRayleigh(VdotS) + (scatterCoeff.w * phaseMie((mode == 2) ? 0.0 : VdotS));
+    vec3 scatterM = scatterCoeff.xyz * phaseRayleigh(VdotM) + (scatterCoeff.w * phaseMie((mode == 2) ? 0.0 : VdotM));
 
     c(float) sunBrightness = 1.0;
     c(float) moonBrightness = 0.03;

@@ -84,4 +84,8 @@
 
   #define getExpDepth(depth) expDepth(depth, near, far)
   float expDepth(in float dist, in float near, in float far) { return (far * (dist - near)) / (dist * (far - near)); }
+
+  c(float) ebsRCP = 1.0 / 240.0;
+  #define getEBS() ebs(eyeBrightnessSmooth)
+  vec2 ebs(in vec2 ebs) { return ebs * ebsRCP; }
 #endif

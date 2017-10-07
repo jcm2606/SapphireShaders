@@ -38,10 +38,11 @@ varying float dist;
     uniform sampler2D specular;
   #endif
 
-  #if SHADER == GBUFFERS_WATER
+  #if SHADER == GBUFFERS_WATER || SHADER == GBUFFERS_TERRAIN || SHADER == GBUFFERS_HAND || SHADER == GBUFFERS_ENTITIES
     uniform sampler2D noisetex;
 
     uniform float frameTimeCounter;
+    uniform float wetness;
   #endif
 
   uniform mat4 gbufferProjection;
@@ -64,6 +65,8 @@ varying float dist;
 
 #include "/lib/gbuffer/Parallax.glsl"
 #include "/lib/gbuffer/DirectionalLightmap.glsl"
+
+#include "/lib/gbuffer/Puddles.glsl"
 
 // MAIN
 void main() {

@@ -20,8 +20,10 @@
     Shadows shadowObject = ShadowObject();
     getShadows(shadowObject);
 
+    //return vec3(shadowObject.dist);
+
     float directShading = (backMaterial.foliage > 0.5) ? 1.0 : DirectShadingModel(fnormalize(position.viewPositionBack), lightVector, backSurface.normal, backSurface.roughness);
-    vec3 directTint = mix(vec3(shadowObject.occlusion.y), interactWater(shadowObject.colour, impurityColour, shadowObject.dist) * diffuseWater(shadowObject.dist), shadowObject.difference);
+    vec3 directTint = mix(vec3(shadowObject.occlusion.y), shadowObject.colour * ((comparef(shadowObject.material, MATERIAL_WATER, ubyteMaxRCP)) ? absorbWater(shadowObject.dist) * diffuseWater(shadowObject.dist) : vec3(1.0)), shadowObject.difference);
 
     float ambientShading = cflattenf(DirectShadingModel(fnormalize(position.viewPositionBack), upVector, backSurface.normal, backSurface.roughness), 0.65);
 
@@ -29,7 +31,7 @@
 
     vec3 direct = lighting[0] * shadowObject.occlusion.x * directShading * directTint;
     vec3 ambient = lighting[1] * backSurface.skyLight * ambientShading;
-    vec3 block = mix(lightingBlock * backSurface.blockLight, lightingBlock * 8.0, backSurface.emission);
+    vec3 block = mix(lightingBlock * backSurface.blockLight, mix(vec3(1.0), lightingBlock * 12.0, backMaterial.emissive), backSurface.emission);
 
     return albedo * (direct + ambient + block);
   }

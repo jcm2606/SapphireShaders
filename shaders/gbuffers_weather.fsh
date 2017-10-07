@@ -14,5 +14,5 @@
 #define SHADER GBUFFERS_WEATHER
 #include "/lib/Syntax.glsl"
 
-/* DRAWBUFFERS:12 */
+/* DRAWBUFFERS:34 */
 #include "/gbuffers_main.fsh"
