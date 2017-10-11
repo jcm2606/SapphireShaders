@@ -59,7 +59,7 @@ void main() {
     vec3 refractPos = refract(nworld, customNormal.xyz, refractInterfaceAirWater);
     float newArea = flength(dFdx(refractPos)) * flength(dFdy(refractPos));
 
-    albedo.rgb = toGamma(vec3(mix(mix(0.35, 0.5, customNormal.a), 1.5, pow((flength(dFdx(world)) * flength(dFdy(world))) / newArea, 0.2))));
+    albedo.rgb = toGamma(vec3(mix(mix(0.35, 0.5, customNormal.x + customNormal.y), 1.5, pow((flength(dFdx(world)) * flength(dFdy(world))) / newArea, 0.2))));
   }
 
   albedo.rgb = toShadowLDR(albedo.rgb);

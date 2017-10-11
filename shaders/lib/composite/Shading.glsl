@@ -23,7 +23,7 @@
     //return vec3(shadowObject.dist);
 
     float directShading = (backMaterial.foliage > 0.5) ? 1.0 : DirectShadingModel(fnormalize(position.viewPositionBack), lightVector, backSurface.normal, backSurface.roughness);
-    vec3 directTint = mix(vec3(shadowObject.occlusion.y), shadowObject.colour * ((comparef(shadowObject.material, MATERIAL_WATER, ubyteMaxRCP)) ? absorbWater(shadowObject.dist) * diffuseWater(shadowObject.dist) : vec3(1.0)), shadowObject.difference);
+    vec3 directTint = mix(vec3(shadowObject.occlusion.x), shadowObject.colour * ((comparef(shadowObject.material, MATERIAL_WATER, ubyteMaxRCP)) ? absorbWater(shadowObject.dist) * diffuseWater(shadowObject.dist) : vec3(1.0)), shadowObject.difference);
 
     float ambientShading = cflattenf(DirectShadingModel(fnormalize(position.viewPositionBack), upVector, backSurface.normal, backSurface.roughness), 0.65);
 

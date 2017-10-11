@@ -63,7 +63,7 @@
       cRCP(float, steps);
 
       float height = (
-        (comparef(material, MATERIAL_WATER, ubyteMaxRCP)) ? PARALLAX_TRANSPARENT_HEIGHT_WATER : (
+        (comparef(material, MATERIAL_WATER, ubyteMaxRCP)) ? parallaxHeightWater : (
           (comparef(material, MATERIAL_ICE, ubyteMaxRCP)) ? PARALLAX_TRANSPARENT_HEIGHT_ICE : (
             (comparef(material, MATERIAL_STAINED_GLASS, ubyteMaxRCP)) ? PARALLAX_TRANSPARENT_HEIGHT_GLASS : 0.0
           )

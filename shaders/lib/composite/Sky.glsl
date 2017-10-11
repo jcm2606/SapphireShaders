@@ -10,11 +10,21 @@
 
   #include "/lib/composite/Atmosphere.glsl"
 
+  #if TYPE == FSH
+    #include "/lib/composite/Stars.glsl"
+  #endif
+
   vec3 drawSky(in vec3 colour, in vec3 dir, in int mode) {
     #if TYPE == FSH
      if(getLandMask(position.depthBack) && mode == 0) return colour;
     #endif
 
-    return getAtmosphere(vec3(0.0), fnormalize(dir), mode);
+    return getAtmosphere(
+      #if TYPE == FSH
+        drawStars(dir)
+      #else
+        vec3(0.0)
+      #endif  
+    , fnormalize(dir), mode);
   }
 #endif

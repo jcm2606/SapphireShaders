@@ -43,6 +43,8 @@ uniform sampler2D depthtex1;
 
 uniform sampler2D shadowtex0;
 
+uniform sampler2D noisetex;
+
 uniform mat4 gbufferProjection;
 uniform mat4 gbufferProjectionInverse;
 uniform mat4 gbufferModelView;
@@ -54,6 +56,7 @@ uniform float viewWidth;
 uniform float viewHeight;
 uniform float near;
 uniform float far;
+uniform float frameTimeCounter;
 
 // STRUCT
 #include "/lib/composite/struct/StructBuffer.glsl"

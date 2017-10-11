@@ -54,11 +54,8 @@
         return vec3(0.0);
       #endif
 
-      vec3 colour = vec3(0.0);
-
-      // LIGHTING TWEAKS
-      lighting[0] *= 2.0;
-
+      vec3 colour = vec3(0.0); 
+      
       // BACK DEPTH
       mat2x3 nViewPosition = mat2x3(
         fnormalize(position.viewPositionBack),
