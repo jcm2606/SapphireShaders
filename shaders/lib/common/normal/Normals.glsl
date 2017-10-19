@@ -140,7 +140,7 @@
       #undef height3
       #undef height4
 
-      return fnormalize(vec3(delta.x, delta.y, 1.0 - pow2(delta.x) - pow2(delta.y)));
+      return (vec3(delta.x, delta.y, 1.0 - pow2(delta.x) - pow2(delta.y)));
     }
   #endif
 #endif

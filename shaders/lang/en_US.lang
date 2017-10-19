@@ -1,0 +1,149 @@
+# Screens
+# Miscellaneous
+screen.Miscellaneous=Miscellaneous
+screen.Miscellaneous.comment=Options that don't quite have a home are categorised under this menu.
+  
+screen.Debugging=Debugging
+screen.Debugging.comment=Options related to debugging in the shader.
+
+screen.Internal=Internal
+screen.Internal.comment=All the internal options for the shader. I HIGHLY recommend not touching ANY options in here, they can potentially break things. You have been warned!
+
+screen.OptifineSettings=Optifine Settings
+screen.OptifineSettings.comment=All options that Optifine parses are found here.
+
+screen.Uncategorised=Uncategorised
+screen.Uncategorised.comment=Options that just don't have a home are found here.
+
+# ShaderConfig
+screen.ShaderConfig=Shader Configuration
+screen.ShaderConfig.comment=Options that alter the entire shader, ie texture resolution, resource format, global speed multiplier, FPS speed multiplier, etc are all found here.
+
+# Atmospherics
+screen.Atmospherics=Atmospherics
+screen.Atmospherics.comment=Options related to atmospherics in the shader, ie volumetric light, volumetric fog, volumetric clouds, the sky, etc.
+
+screen.Volumetrics=Volumetrics
+screen.Volumetrics.comment=Options related to volumetrics in the shader, ie volumetric light, volumetric fog, etc. Excludes volumetric clouds, since they use a separate, independent marcher to these volumetrics.
+
+screen.Fog=Volumetric Fog
+screen.Fog.comment=Options related to the fog portion of the volumetrics implementation.
+
+screen.Sky=Sky
+screen.Sky.comment=Options related to the sky in the shader.
+
+screen.Clouds=Clouds
+screen.Clouds.comment=Options related to clouds in the shader.
+
+# Geometry
+screen.Geometry=Geometry
+screen.Geometry.comment=Options related to geometry in the shader, ie parallax, vertex displacement, waving terrain, etc.
+
+screen.Parallax=Parallax
+screen.Parallax.comment=Options related to parallax effects in the shader, for both opaque and transparent blocks. Parallax is a technique used to give the impression of 3D depth, by shifting the texture around based on a height map supplied by the normal map.
+
+screen.ParallaxTerrain=Opaque Parallax Options
+screen.ParallaxTerrain.comment=Options related to parallax on opaque blocks.
+
+screen.ParallaxTransparent=Transparent Parallax Options
+screen.ParallaxTransparent.comment=Options related to parallax on transparent blocks.
+
+screen.VertexDisplacement=Vertex Displacement
+screen.VertexDisplacement.comment=Options related to vertex displacement in the shader, ie planetary deformation, waving terrain, etc.
+
+# Surfaces
+screen.Surface=Surfaces
+screen.Surface.comment=Options related to surfaces in the shader, ie reflections, refraction, normals, etc.
+
+screen.Reflections=Reflections
+screen.Reflections.comment=Options related to reflections in the shader.
+
+screen.Refraction=Refraction
+screen.Refraction.comment=Options related to refraction in the shader.
+
+screen.Normals=Normals
+screen.Normals.comment=Options related to normals in the shader, ie maximum normal angles for opaque, wet and transparent blocks, normal types for transparent blocks, etc.
+
+# Post Process
+screen.PostProcess=Post Process
+screen.PostProcess.comment=Options related to all post-process effects in the shader, ie tonemapping, bloom, lens effects, etc.
+
+screen.Tonemapping=Tonemapping
+screen.Tonemapping.comment=Options related to tonemapping in the shader. The shader deals with colours that can exceed the 0 -> 1 range, however our monitors only work within that range. So to squish colours back down into the 0 -> 1 range, a special operation is performed on them, called a tonemap.
+
+screen.Bloom=Bloom
+screen.Bloom.comment=Options related to bloom in the shader.
+
+# Shading
+screen.Shading=Shading
+screen.Shading.comment=Options related to shading in the shader, ie lighting, shadows, diffuse shading models, etc.
+
+screen.Shadows=Shadows
+screen.Shadows.comment=Options related to shadows in the shader.
+
+# Options
+# Miscellanous
+# Debugging
+option.DEBUGGING=Debugging
+option.DEBUG_STAGE=Stage Selection
+option.DEBUG_GBUFFERS=Visualise G-Buffers
+
+# Internal
+# OptifineSettings
+option.wetnessHalflife=Wetness Halflife
+option.drynessHalflife=Dryness Halflife
+option.sunPathRotation=Sun Rotation
+option.centerDepthHalflife=Centered Depth Halflife
+option.ambientOcclusionLevel=Minecraft AO Level
+option.eyeBrightnessHalflife=Eye Brightness Halflife
+
+# ShaderConfig
+option.GLOBAL_SPEED=Global Speed Multiplier
+option.TEXTURE_RESOLUTION=Texture Resolution
+value.TEXTURE_RESOLUTION.16.0=16x16
+value.TEXTURE_RESOLUTION.32.0=32x32
+value.TEXTURE_RESOLUTION.64.0=64x64
+value.TEXTURE_RESOLUTION.128.0=128x128
+value.TEXTURE_RESOLUTION.256.0=256x256
+value.TEXTURE_RESOLUTION.512.0=512x512
+value.TEXTURE_RESOLUTION.1024.0=1024x1024
+value.TEXTURE_RESOLUTION.2048.0=2048x2048
+value.TEXTURE_RESOLUTION.4096.0=4096x4096
+value.TEXTURE_RESOLUTION.8192.0=8192x8192
+option.RESOURCE_FORMAT=Texture Format
+value.RESOURCE_FORMAT.0=Specular
+value.RESOURCE_FORMAT.1=Old PBR, no emission
+value.RESOURCE_FORMAT.2=Old PBR, emission
+value.RESOURCE_FORMAT.3=New PBR
+
+# Atmospherics
+# Volumetrics
+option.VOLUMETRICS=Enable Volumetrics
+option.VOLUMETRICS_SHADOW_SKY_APPROXIMATION=Sky Shadow Approximation
+
+# Volumetric Fog
+option.VOLUMETRICS_FOG_DENSITY_HEIGHT=Height Fog Density
+option.VOLUMETRICS_FOG_DENSITY_GROUND=Ground Fog Density
+
+# Sky
+# Clouds
+# Geometry
+# Parallax
+option.PARALLAX_TERRAIN=Opaque Parallax
+option.PARALLAX_TRANSPARENT=Transparent Parallax
+
+# Opaque Parallax
+option.PARALLAX_TERRAIN_QUALITY_SCALING=Quality Scaling
+option.PARALLAX_TERRAIN_QUALITY_FIXED=Fixed Quality
+option.PARALLAX_TERRAIN_DEPTH=Depth
+
+# Transparent Parallax
+option.PARALLAX_TRANSPARENT_STEPS=Steps
+option.PARALLAX_TRANSPARENT_HEIGHT_WATER=Water Height
+option.PARALLAX_TRANSPARENT_HEIGHT_ICE=Ice Height
+option.PARALLAX_TRANSPARENT_HEIGHT_GLASS=Glass Height
+
+# Vertex Displacement
+# Surface
+# Post Process
+# Shading
